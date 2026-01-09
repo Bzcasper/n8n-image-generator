@@ -87,11 +87,14 @@ curl -X POST "https://your-n8n-instance.com/webhook/generate-image" \
    - Copy the webhook URL from n8n
    - Update the endpoint in your frontend configuration
 
-5. **Configure Environment Variables**
-   ```bash
-   # Go to src/ImageGenerator.tsx paste your n8n url here under try section
-   webhookUrl=https://your-n8n-webhook-url.com
-   ```
+ 5. **Configure Environment Variables**
+    ```bash
+    # Create a .env file in the root directory
+    cp .env.example .env
+
+    # Edit .env and set your n8n webhook URL
+    VITE_N8N_WEBHOOK_URL=https://your-n8n-webhook-url.com
+    ```
 
 ## 📖 API Documentation
 

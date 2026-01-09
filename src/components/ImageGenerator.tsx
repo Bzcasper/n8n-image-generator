@@ -17,8 +17,12 @@ const ImageGenerator = () => {
     setError(null);
 
     try {
-      // In a real implementation, replace this URL with your n8n workflow webhook URL
-      const webhookUrl = 'YOUR N8N WEBHOOK LINK HERE';
+      // Webhook URL from environment variable
+      const webhookUrl = import.meta.env.VITE_N8N_WEBHOOK_URL;
+
+      if (!webhookUrl) {
+        throw new Error('Webhook URL not configured. Please set VITE_N8N_WEBHOOK_URL in your .env file.');
+      }
       
       const queryParams = new URLSearchParams({
         message: params.message,
