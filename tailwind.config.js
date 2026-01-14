@@ -4,9 +4,9 @@ export default {
   theme: {
     extend: {
       colors: {
-        border: 'hsl(var(--border))',
-        background: 'hsl(var(--background))',
-        foreground: 'hsl(var(--foreground))',
+        navy: '#006D88',
+        mint: '#48E5B6',
+        blue: '#00B4FF',
       },
     },
   },
