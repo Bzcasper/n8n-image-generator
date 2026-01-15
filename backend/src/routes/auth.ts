@@ -24,29 +24,7 @@ const prisma = new PrismaClient();
 
 export async function authRoutes(fastify: FastifyInstance) {
   // User registration
-  fastify.post('/register', {
-    schema: {
-      body: registerSchema,
-      response: {
-        201: z.object({
-          user: z.object({
-            id: z.string(),
-            email: z.string(),
-            username: z.string().nullable(),
-            firstName: z.string().nullable(),
-            lastName: z.string().nullable(),
-            role: z.string(),
-            createdAt: z.string(),
-          }),
-          accessToken: z.string(),
-          refreshToken: z.string(),
-        }),
-        400: z.object({ error: z.string() }),
-        409: z.object({ error: z.string() }),
-        500: z.object({ error: z.string() }),
-      },
-    },
-  }, async (request, reply) => {
+  fastify.post('/register', async (request, reply) => {
     try {
       const body = request.body as RegisterInput;
       const { email, password, username, firstName, lastName } = body;
@@ -118,27 +96,7 @@ export async function authRoutes(fastify: FastifyInstance) {
   });
 
   // User login
-  fastify.post('/login', {
-    schema: {
-      body: loginSchema,
-      response: {
-        200: z.object({
-          user: z.object({
-            id: z.string(),
-            email: z.string(),
-            username: z.string().nullable(),
-            firstName: z.string().nullable(),
-            lastName: z.string().nullable(),
-            role: z.string(),
-          }),
-          accessToken: z.string(),
-          refreshToken: z.string(),
-        }),
-        401: z.object({ error: z.string() }),
-        500: z.object({ error: z.string() }),
-      },
-    },
-  }, async (request, reply) => {
+  fastify.post('/login', async (request, reply) => {
     try {
       const body = request.body as LoginInput;
       const { email, password } = body;
@@ -202,18 +160,7 @@ export async function authRoutes(fastify: FastifyInstance) {
   });
 
   // Refresh access token
-  fastify.post('/refresh', {
-    schema: {
-      body: refreshTokenSchema,
-      response: {
-        200: z.object({
-          accessToken: z.string(),
-        }),
-        401: z.object({ error: z.string() }),
-        500: z.object({ error: z.string() }),
-      },
-    },
-  }, async (request, reply) => {
+  fastify.post('/refresh', async (request, reply) => {
     try {
       const body = request.body as RefreshTokenInput;
       const { refreshToken } = body;
@@ -308,25 +255,6 @@ export async function authRoutes(fastify: FastifyInstance) {
   // Update user profile
   fastify.put('/me', {
     preHandler: authenticate,
-    schema: {
-      body: updateProfileSchema,
-      response: {
-        200: z.object({
-          user: z.object({
-            id: z.string(),
-            email: z.string(),
-            username: z.string().nullable(),
-            firstName: z.string().nullable(),
-            lastName: z.string().nullable(),
-            avatar: z.string().nullable(),
-            updatedAt: z.string(),
-          }),
-        }),
-        400: z.object({ error: z.string() }),
-        409: z.object({ error: z.string() }),
-        500: z.object({ error: z.string() }),
-      },
-    },
   }, async (request, reply) => {
     try {
       const updates = request.body as UpdateProfileInput;
