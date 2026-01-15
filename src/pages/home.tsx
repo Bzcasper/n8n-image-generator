@@ -1,0 +1,214 @@
+import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Sparkles, Zap, Shield, Loader2 } from 'lucide-react';
+import { SignedIn, SignedOut } from '@neondatabase/neon-js/auth/react/ui';
+import { authClient } from '../lib/auth';
+
+export function Home() {
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const containerRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
+  
+  const session = authClient.useSession();
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!containerRef.current) return;
+      const { clientX, clientY } = e;
+      const { innerWidth, innerHeight } = window;
+      
+      const x = (clientX / innerWidth) * 2 - 1;
+      const y = (clientY / innerHeight) * 2 - 1;
+      
+      setMousePos({ x, y });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
+  const navigateToApp = () => {
+    navigate('/app');
+  };
+
+  if (session.isPending) {
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #48E5B6 0%, #00B4FF 50%, #006D88 100%)'
+      }}>
+        <div style={{ textAlign: 'center', color: 'white' }}>
+          <Loader2 className="animate-spin" size={48} style={{ margin: '0 auto 1rem' }} />
+          <p>Loading SplashTool...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      ref={containerRef}
+      className="min-h-screen w-full relative overflow-hidden flex flex-col text-slate-900 bg-[#F0F2F5]"
+    >
+      {/* Dynamic Background Blobs */}
+      <div 
+        className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full blur-[120px] opacity-40 mix-blend-multiply transition-transform duration-75 ease-out will-change-transform pointer-events-none"
+        style={{ 
+          backgroundColor: '#48E5B6',
+          transform: `translate(${mousePos.x * -40}px, ${mousePos.y * -40}px)` 
+        }}
+      />
+      <div 
+        className="absolute bottom-[-10%] right-[-10%] w-[60vw] h-[60vw] rounded-full blur-[140px] opacity-40 mix-blend-multiply transition-transform duration-100 ease-out will-change-transform pointer-events-none"
+        style={{ 
+          backgroundColor: '#00B4FF',
+          transform: `translate(${mousePos.x * 50}px, ${mousePos.y * 50}px)` 
+        }}
+      />
+      <div 
+        className="absolute top-[20%] right-[20%] w-[30vw] h-[30vw] rounded-full blur-[100px] opacity-30 mix-blend-multiply transition-transform duration-150 ease-out will-change-transform pointer-events-none"
+        style={{ 
+          backgroundColor: '#006D88',
+           transform: `translate(${mousePos.x * -20}px, ${mousePos.y * -20}px)` 
+        }}
+      />
+
+      {/* Logo in Upper Left - Clickable */}
+      <div className="absolute top-0 left-[-3rem] md:left-[-6rem] z-50 p-2 cursor-pointer hover:scale-105 transition-transform duration-300" onClick={navigateToApp}>
+        <img
+          src="/Gemini_Generated_Image_h7y6jnh7y6jnh7y6.webp"
+          alt="SplashTool Logo"
+          className="w-72 md:w-[24rem] h-auto drop-shadow-2xl"
+        />
+      </div>
+
+      {/* Navigation Buttons - Upper Right */}
+      <nav className="absolute top-6 right-6 z-50 flex items-center gap-8">
+        <button onClick={navigateToApp} className="relative px-4 py-2 text-base font-bold font-varela uppercase tracking-wider transition-all duration-300 active:scale-95 group overflow-hidden">
+          <span className="relative z-20 bg-gradient-to-r from-[#00B4FF] via-[#48E5B6] to-[#006D88] bg-clip-text text-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">Image</span>
+          <span className="absolute inset-0 z-20 flex items-center justify-center text-black group-hover:opacity-0 transition-opacity duration-300">Image</span>
+          <div className="absolute inset-0 z-10 bg-white opacity-0 group-hover:opacity-100 transition-opacity duration-800 rounded-lg"></div>
+          <div className="absolute inset-0 z-10 border-2 border-transparent rounded-lg transition-all duration-500 group-hover:border-[#00B4FF] group-hover:animate-border-draw group-hover:shadow-[0_0_20px_rgba(0,180,255,0.4),0_0_40px_rgba(72,229,182,0.3),0_0_60px_rgba(0,109,136,0.2)]"></div>
+        </button>
+        <button className="relative px-4 py-2 text-base font-bold font-varela uppercase tracking-wider transition-all duration-300 active:scale-95 group overflow-hidden">
+          <span className="relative z-20 bg-gradient-to-r from-[#00B4FF] via-[#48E5B6] to-[#006D88] bg-clip-text text-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">Video</span>
+          <span className="absolute inset-0 z-20 flex items-center justify-center text-black group-hover:opacity-0 transition-opacity duration-300">Video</span>
+          <div className="absolute inset-0 z-10 bg-white opacity-0 group-hover:opacity-100 transition-opacity duration-800 rounded-lg"></div>
+          <div className="absolute inset-0 z-10 border-2 border-transparent rounded-lg transition-all duration-500 group-hover:border-[#00B4FF] group-hover:animate-border-draw group-hover:shadow-[0_0_20px_rgba(0,180,255,0.4),0_0_40px_rgba(72,229,182,0.3),0_0_60px_rgba(0,109,136,0.2)]"></div>
+        </button>
+        <button className="relative px-4 py-2 text-base font-bold font-varela uppercase tracking-wider transition-all duration-300 active:scale-95 group overflow-hidden">
+          <span className="relative z-20 bg-gradient-to-r from-[#00B4FF] via-[#48E5B6] to-[#006D88] bg-clip-text text-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">Gallery</span>
+          <span className="absolute inset-0 z-20 flex items-center justify-center text-black group-hover:opacity-0 transition-opacity duration-300">Gallery</span>
+          <div className="absolute inset-0 z-10 bg-white opacity-0 group-hover:opacity-100 transition-opacity duration-800 rounded-lg"></div>
+          <div className="absolute inset-0 z-10 border-2 border-transparent rounded-lg transition-all duration-500 group-hover:border-[#00B4FF] group-hover:animate-border-draw group-hover:shadow-[0_0_20px_rgba(0,180,255,0.4),0_0_40px_rgba(72,229,182,0.3),0_0_60px_rgba(0,109,136,0.2)]"></div>
+        </button>
+        
+        <SignedIn>
+          <button 
+            onClick={() => navigate('/account/profile')} 
+            className="relative px-5 py-2 text-base font-bold font-varela uppercase tracking-wider border-2 border-black/20 rounded-lg transition-all duration-300 hover:border-[#48E5B6] active:scale-95 group overflow-hidden"
+          >
+            <span className="relative z-20 bg-gradient-to-r from-[#48E5B6] via-[#00B4FF] to-[#006D88] bg-clip-text text-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">Account</span>
+            <span className="absolute inset-0 z-20 flex items-center justify-center text-black group-hover:opacity-0 transition-opacity duration-300">Account</span>
+            <div className="absolute inset-0 z-10 bg-white opacity-0 group-hover:opacity-100 transition-opacity duration-800 rounded-lg"></div>
+          </button>
+        </SignedIn>
+        <SignedOut>
+          <button 
+            onClick={() => navigate('/auth/sign-in')} 
+            className="relative px-5 py-2 text-base font-bold font-varela uppercase tracking-wider border-2 border-black/20 rounded-lg transition-all duration-300 hover:border-[#48E5B6] active:scale-95 group overflow-hidden"
+          >
+            <span className="relative z-20 bg-gradient-to-r from-[#48E5B6] via-[#00B4FF] to-[#006D88] bg-clip-text text-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">Sign In</span>
+            <span className="absolute inset-0 z-20 flex items-center justify-center text-black group-hover:opacity-0 transition-opacity duration-300">Sign In</span>
+            <div className="absolute inset-0 z-10 bg-white opacity-0 group-hover:opacity-100 transition-opacity duration-800 rounded-lg"></div>
+          </button>
+        </SignedOut>
+      </nav>
+
+      {/* Main Content */}
+      <main className="relative z-10 flex-grow flex flex-col justify-center items-center text-center px-6 pt-16">
+        
+        {/* Big Bold Headline */}
+        <h1 className="max-w-5xl mx-auto text-6xl md:text-8xl font-black tracking-tight leading-[0.9] mb-4 font-sniglet">
+          <span className="block font-varela text-black drop-shadow-sm">Think. Prompt.</span>
+          <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#00B4FF] via-[#48E5B6] to-[#006D88] animate-gradient-x block filter drop-shadow-sm text-7xl md:text-[10rem] leading-none">
+            SPLASH
+          </span>
+        </h1>
+
+        {/* Subtitle */}
+        <p className="max-w-lg mx-auto text-lg md:text-2xl text-slate-600 mb-8 font-varela font-bold tracking-wide">
+          AI-powered image generation that flows like water
+        </p>
+
+        {/* Generate Button */}
+        <div className="mb-16 relative group">
+          <div
+            className="absolute inset-0 blur-3xl opacity-60 group-hover:opacity-100 transition-opacity duration-500 animate-pulse-glow"
+            style={{
+              background: 'radial-gradient(circle, #48E5B6 0%, #00B4FF 50%, #006D88 100%)',
+              transform: 'scale(1.2)',
+            }}
+          />
+
+          <button
+            onClick={navigateToApp}
+            className="relative z-10 inline-flex items-center justify-center px-16 py-5 text-xl md:text-2xl font-black tracking-wide text-white transition-all hover:-translate-y-2 active:translate-y-0 shadow-[0_20px_60px_rgba(0,109,136,0.5)] animate-float font-sniglet"
+            style={{
+              background: 'linear-gradient(135deg, #48E5B6 0%, #00B4FF 50%, #006D88 100%)',
+              borderRadius: '20px',
+              boxShadow: '0 15px 45px rgba(0, 109, 136, 0.4), 0 0 30px rgba(72, 229, 182, 0.3), inset 0 -4px 15px rgba(0, 0, 0, 0.15)',
+            }}
+          >
+            <span className="relative z-10">Generate Now</span>
+            <div className="absolute inset-0 rounded-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 60%)',
+            }} />
+          </button>
+        </div>
+
+        {/* Feature Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-3xl mx-auto mb-0 -mt-4 px-4">
+          <div className="aspect-square bg-white/95 backdrop-blur-sm p-4 rounded-20 shadow-2xl border-b-4 border-[#48E5B6] transform hover:-translate-y-1 transition-all duration-300 flex flex-col items-center justify-center text-center">
+            <div className="w-12 h-12 bg-[#48E5B6]/15 rounded-2xl flex items-center justify-center mb-3">
+              <Sparkles className="text-[#48E5B6] w-7 h-7" />
+            </div>
+            <h3 className="text-lg font-black mb-2 font-sniglet text-black uppercase tracking-wide">Pure Magic</h3>
+            <p className="text-slate-700 font-varela text-xs font-bold leading-relaxed">
+              Transform thoughts into breathtaking masterpieces with AI.
+            </p>
+          </div>
+
+          <div className="aspect-square bg-white/95 backdrop-blur-sm p-4 rounded-20 shadow-2xl border-b-4 border-[#00B4FF] transform hover:-translate-y-1 transition-all duration-300 flex flex-col items-center justify-center text-center">
+            <div className="w-12 h-12 bg-[#00B4FF]/15 rounded-2xl flex items-center justify-center mb-3">
+              <Zap className="text-[#00B4FF] w-7 h-7" />
+            </div>
+            <h3 className="text-lg font-black mb-2 font-sniglet text-black uppercase tracking-wide">Instant Flow</h3>
+            <p className="text-slate-700 font-varela text-xs font-bold leading-relaxed">
+              Lightning-fast generation speeds to keep you creative.
+            </p>
+          </div>
+
+          <div className="aspect-square bg-white/95 backdrop-blur-sm p-4 rounded-20 shadow-2xl border-b-4 border-[#006D88] transform hover:-translate-y-1 transition-all duration-300 flex flex-col items-center justify-center text-center">
+            <div className="w-12 h-12 bg-[#006D88]/15 rounded-2xl flex items-center justify-center mb-3">
+              <Shield className="text-[#006D88] w-7 h-7" />
+            </div>
+            <h3 className="text-lg font-black mb-2 font-sniglet text-black uppercase tracking-wide">Secure Stream</h3>
+            <p className="text-slate-700 font-varela text-xs font-bold leading-relaxed">
+              Your creations handled with top privacy and security.
+            </p>
+          </div>
+        </div>
+
+      </main>
+
+      {/* Footer */}
+      <footer className="w-full py-4 text-center relative z-10">
+        <p className="text-[#006D88]/50 text-sm font-questrial">Powered by AI Tool Pool</p>
+      </footer>
+    </div>
+  );
+}
