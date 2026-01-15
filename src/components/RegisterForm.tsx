@@ -62,7 +62,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleMode, onSuccess }) 
           value={formData.email}
           onChange={handleChange}
           required
-          className="w-full px-4 py-2 rounded-16 border border-gray-300 focus:border-blue focus:ring-2 focus:ring-blue/20 outline-none transition-all font-varela"
+          className="w-full px-4 py-2 rounded-16 border border-gray-300 focus:border-blue focus:ring-2 focus:ring-blue/20 outline-none transition-all font-varela text-navy"
           placeholder="your@email.com"
         />
       </div>
@@ -78,7 +78,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleMode, onSuccess }) 
           value={formData.username}
           onChange={handleChange}
           minLength={3}
-          className="w-full px-4 py-2 rounded-16 border border-gray-300 focus:border-blue focus:ring-2 focus:ring-blue/20 outline-none transition-all font-varela"
+          className="w-full px-4 py-2 rounded-16 border border-gray-300 focus:border-blue focus:ring-2 focus:ring-blue/20 outline-none transition-all font-varela text-navy"
           placeholder="username"
         />
       </div>
@@ -94,7 +94,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleMode, onSuccess }) 
             type="text"
             value={formData.firstName}
             onChange={handleChange}
-            className="w-full px-4 py-2 rounded-16 border border-gray-300 focus:border-blue focus:ring-2 focus:ring-blue/20 outline-none transition-all font-varela"
+            className="w-full px-4 py-2 rounded-16 border border-gray-300 focus:border-blue focus:ring-2 focus:ring-blue/20 outline-none transition-all font-varela text-navy"
             placeholder="John"
           />
         </div>
@@ -109,7 +109,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleMode, onSuccess }) 
             type="text"
             value={formData.lastName}
             onChange={handleChange}
-            className="w-full px-4 py-2 rounded-16 border border-gray-300 focus:border-blue focus:ring-2 focus:ring-blue/20 outline-none transition-all font-varela"
+            className="w-full px-4 py-2 rounded-16 border border-gray-300 focus:border-blue focus:ring-2 focus:ring-blue/20 outline-none transition-all font-varela text-navy"
             placeholder="Doe"
           />
         </div>
@@ -127,7 +127,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleMode, onSuccess }) 
           onChange={handleChange}
           required
           minLength={8}
-          className="w-full px-4 py-2 rounded-16 border border-gray-300 focus:border-blue focus:ring-2 focus:ring-blue/20 outline-none transition-all font-varela"
+          className="w-full px-4 py-2 rounded-16 border border-gray-300 focus:border-blue focus:ring-2 focus:ring-blue/20 outline-none transition-all font-varela text-navy"
           placeholder="•••••••••"
         />
       </div>
@@ -144,7 +144,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleMode, onSuccess }) 
           onChange={(e) => setConfirmPassword(e.target.value)}
           required
           minLength={8}
-          className="w-full px-4 py-2 rounded-16 border border-gray-300 focus:border-blue focus:ring-2 focus:ring-blue/20 outline-none transition-all font-varela"
+          className="w-full px-4 py-2 rounded-16 border border-gray-300 focus:border-blue focus:ring-2 focus:ring-blue/20 outline-none transition-all font-varela text-navy"
           placeholder="•••••••••"
         />
       </div>

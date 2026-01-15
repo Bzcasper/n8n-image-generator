@@ -73,7 +73,7 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({ image, isLoading, error, on
 
   return (
     <>
-      <div className="bg-white/90 backdrop-blur-md rounded-20 shadow-xl p-4 border border-navy/10 h-full flex flex-col overflow-hidden">
+      <div className="bg-white/90 backdrop-blur-md rounded-20 shadow-xl p-4 md:p-6 border border-navy/10 h-full flex flex-col min-h-0 overflow-hidden">
         <div className="flex items-center justify-between mb-4 flex-shrink-0">
           <div>
             <h3 className="text-xl font-black font-sniglet text-black uppercase tracking-tight leading-none">Your Splash</h3>
@@ -105,7 +105,7 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({ image, isLoading, error, on
           </div>
         </div>
 
-        <div className="relative flex-grow flex items-center justify-center bg-navy/[0.02] rounded-xl overflow-hidden border border-navy/5 shadow-inner p-2 group">
+        <div className="relative flex-grow flex items-center justify-center bg-navy/[0.02] rounded-xl overflow-hidden border border-navy/5 shadow-inner p-2 min-h-0 group">
           <img
             src={image.url}
             alt={image.prompt}

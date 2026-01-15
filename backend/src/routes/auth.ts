@@ -1,4 +1,5 @@
 import { FastifyInstance } from 'fastify';
+import { Prisma } from '@prisma/client';
 import {
   hashPassword,
   verifyPassword,
@@ -53,7 +54,7 @@ export async function authRoutes(fastify: FastifyInstance) {
 
       const hashedPassword = await hashPassword(password);
 
-      const result = await prisma.$transaction(async (tx) => {
+      const result = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
         const user = await tx.user.create({
           data: {
             email,
@@ -154,7 +155,7 @@ export async function authRoutes(fastify: FastifyInstance) {
         role: user.role,
       });
 
-      await prisma.$transaction(async (tx) => {
+      await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
         await tx.session.deleteMany({
           where: { userId: user.id },
         });

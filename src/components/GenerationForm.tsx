@@ -69,7 +69,7 @@ const GenerationForm: React.FC<GenerationFormProps> = ({ onGenerate, isLoading, 
   const isFormValid = message.trim().length >= 3 && message.trim().length <= 500;
 
   return (
-    <div className="bg-white/90 backdrop-blur-md rounded-20 shadow-xl p-6 border border-navy/10 h-full flex flex-col">
+    <div className="bg-white/90 backdrop-blur-md rounded-20 shadow-xl p-4 md:p-6 border border-navy/10 h-full flex flex-col min-h-0">
       <div className="flex items-center space-x-3 mb-6">
         <div className="p-2 bg-navy/5 rounded-lg">
           <Wand2 className="w-5 h-5 text-navy" />
@@ -80,7 +80,7 @@ const GenerationForm: React.FC<GenerationFormProps> = ({ onGenerate, isLoading, 
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-5 flex-grow flex flex-col overflow-hidden">
+      <form onSubmit={handleSubmit} className="space-y-4 md:space-y-5 flex-grow flex flex-col min-h-0 overflow-hidden">
         <div className="space-y-2">
           <label htmlFor="message" className="block text-[11px] font-black font-varela text-navy uppercase tracking-widest">
             Prompt
@@ -105,7 +105,7 @@ const GenerationForm: React.FC<GenerationFormProps> = ({ onGenerate, isLoading, 
 
         <div className="space-y-3">
           <label className="block text-[11px] font-black font-varela text-navy uppercase tracking-widest">Art Style</label>
-          <div className="grid grid-cols-2 gap-3 overflow-y-auto max-h-[120px] pr-1 custom-scrollbar">
+          <div className="grid grid-cols-2 gap-3 overflow-y-auto max-h-[160px] md:max-h-[180px] pr-1 custom-scrollbar">
             {STYLE_OPTIONS.map((option) => (
               <label key={option.value} className={`group flex flex-col items-center justify-center p-3 border-2 rounded-16 cursor-pointer transition-all duration-300 relative overflow-hidden ${
                 style === option.value
@@ -186,7 +186,7 @@ const GenerationForm: React.FC<GenerationFormProps> = ({ onGenerate, isLoading, 
         </div>
 
         {showAdvanced && (
-          <div className="space-y-4 pt-4 border-t border-navy/5 animate-in slide-in-from-top duration-300 flex-shrink-0 overflow-y-auto max-h-[150px] pr-1 custom-scrollbar">
+          <div className="space-y-4 pt-4 border-t border-navy/5 animate-in slide-in-from-top duration-300 flex-shrink-0 overflow-y-auto max-h-[200px] md:max-h-[250px] pr-1 custom-scrollbar">
             <div className="grid grid-cols-2 gap-4">
                <div className="space-y-1">
                  <label className="block text-[9px] font-black font-varela text-navy/40 uppercase tracking-widest">Quality Level</label>

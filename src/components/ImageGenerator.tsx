@@ -197,7 +197,7 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({ onBackToLanding }) => {
   return (
     <div
       ref={containerRef}
-      className="h-screen bg-[#F0F2F5] relative overflow-hidden flex flex-col"
+      className="min-h-screen bg-[#F0F2F5] relative overflow-x-hidden flex flex-col"
     >
       {/* Dynamic Background Blobs */}
       <div
@@ -225,10 +225,10 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({ onBackToLanding }) => {
       <div className="relative z-10 flex flex-col h-full">
         <Header onBackToLanding={onBackToLanding} />
 
-        <main className="flex-grow flex flex-col overflow-hidden px-6 py-4">
-          <div className="flex-grow grid grid-cols-1 lg:grid-cols-12 gap-6 overflow-hidden max-w-[1600px] mx-auto w-full">
+        <main className="flex-grow flex flex-col px-4 md:px-6 py-4">
+          <div className="flex-grow grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6 overflow-hidden max-w-[1600px] mx-auto w-full min-h-0">
             {/* Left Column: Form */}
-            <div className="lg:col-span-5 h-full overflow-y-auto pr-2 custom-scrollbar">
+            <div className="lg:col-span-4 min-h-0 flex flex-col">
               <GenerationForm
                 onGenerate={generateImage}
                 isLoading={isLoading}
@@ -237,7 +237,7 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({ onBackToLanding }) => {
             </div>
 
             {/* Right Column: Main Image Display */}
-            <div className="lg:col-span-7 h-full flex flex-col overflow-hidden">
+            <div className="lg:col-span-8 min-h-0 flex flex-col">
               <ImageDisplay
                 image={currentImage}
                 isLoading={isLoading}
@@ -248,7 +248,7 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({ onBackToLanding }) => {
           </div>
 
           {/* Bottom Section: History */}
-          <div className="mt-6 h-48 flex-shrink-0">
+          <div className="mt-4 md:mt-6 flex-shrink-0 h-40 md:h-48">
             <ImageGallery
               images={imageHistory}
               onImageSelect={handleImageSelect}

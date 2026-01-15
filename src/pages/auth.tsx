@@ -60,7 +60,7 @@ export function Auth() {
           src="/Gemini_Generated_Image_h7y6jnh7y6jnh7y6.webp"
           alt="SplashTool Logo"
           style={{
-            width: '200px',
+            width: '700px',
             height: 'auto',
             filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))',
           }}
