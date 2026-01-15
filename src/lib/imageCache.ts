@@ -1,6 +1,7 @@
 import { GeneratedImage } from '../types';
 
 const SESSION_STORAGE_KEY = 'splashtool_images';
+const MAX_CACHED_IMAGES = 50; // Maximum number of images to cache in session storage
 
 export const sessionImageCache = {
   getImages: (): GeneratedImage[] => {
@@ -24,7 +25,7 @@ export const sessionImageCache = {
         images.unshift(image);
       }
 
-      const limitedImages = images.slice(0, 50);
+      const limitedImages = images.slice(0, MAX_CACHED_IMAGES);
       sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(limitedImages));
     } catch (error) {
       console.error('Failed to cache image:', error);

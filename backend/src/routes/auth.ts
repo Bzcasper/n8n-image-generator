@@ -1,5 +1,4 @@
 import { FastifyInstance } from 'fastify';
-import { PrismaClient } from '@prisma/client';
 import {
   hashPassword,
   verifyPassword,
@@ -14,8 +13,7 @@ import {
   updateProfileSchema,
 } from '../utils/validation.js';
 import { authenticate } from '../middleware/auth.js';
-
-const prisma = new PrismaClient();
+import { prisma } from '../lib/prisma.js';
 
 export async function authRoutes(fastify: FastifyInstance) {
   fastify.post('/register', async (request, reply) => {
@@ -55,46 +53,57 @@ export async function authRoutes(fastify: FastifyInstance) {
 
       const hashedPassword = await hashPassword(password);
 
-      const user = await prisma.user.create({
-        data: {
-          email,
-          password: hashedPassword,
-          username,
-          firstName,
-          lastName,
-        },
-        select: {
-          id: true,
-          email: true,
-          username: true,
-          firstName: true,
-          lastName: true,
-          role: true,
-          createdAt: true,
-        },
-      });
+      const result = await prisma.$transaction(async (tx) => {
+        const user = await tx.user.create({
+          data: {
+            email,
+            password: hashedPassword,
+            username,
+            firstName,
+            lastName,
+          },
+          select: {
+            id: true,
+            email: true,
+            username: true,
+            firstName: true,
+            lastName: true,
+            role: true,
+            createdAt: true,
+          },
+        });
 
-      const tokens = generateTokenPair({
-        userId: user.id,
-        email: user.email,
-        role: user.role,
-      });
-
-      await prisma.session.create({
-        data: {
+        const tokens = generateTokenPair({
           userId: user.id,
-          refreshToken: tokens.refreshToken,
-          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-        },
+          email: user.email,
+          role: user.role,
+        });
+
+        await tx.session.create({
+          data: {
+            userId: user.id,
+            refreshToken: tokens.refreshToken,
+            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+          },
+        });
+
+        return { user, tokens };
       });
 
       reply.code(201).send({
-        user,
-        accessToken: tokens.accessToken,
-        refreshToken: tokens.refreshToken,
+        user: result.user,
+        accessToken: result.tokens.accessToken,
+        refreshToken: result.tokens.refreshToken,
       });
     } catch (error) {
       console.error('Registration error:', error);
+      if (error && typeof error === 'object' && 'code' in error && error.code === 'P2002') {
+        const prismaError = error as { code: string; meta?: { target?: string[] } };
+        return reply.code(409).send({
+          error: 'Email already registered',
+          field: prismaError.meta?.target,
+        });
+      }
       reply.code(500).send({ error: 'Internal server error' });
     }
   });
@@ -145,16 +154,18 @@ export async function authRoutes(fastify: FastifyInstance) {
         role: user.role,
       });
 
-      await prisma.session.deleteMany({
-        where: { userId: user.id },
-      });
+      await prisma.$transaction(async (tx) => {
+        await tx.session.deleteMany({
+          where: { userId: user.id },
+        });
 
-      await prisma.session.create({
-        data: {
-          userId: user.id,
-          refreshToken: tokens.refreshToken,
-          expiresAt: new Date(Date.now() +7 * 24 * 60 * 60 * 1000),
-        },
+        await tx.session.create({
+          data: {
+            userId: user.id,
+            refreshToken: tokens.refreshToken,
+            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+          },
+        });
       });
 
       reply.send({

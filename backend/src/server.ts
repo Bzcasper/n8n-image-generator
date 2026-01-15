@@ -5,6 +5,7 @@ import rateLimit from '@fastify/rate-limit';
 import { authRoutes } from './routes/auth.js';
 import { userRoutes } from './routes/users.js';
 import { rateLimitRoutes } from './routes/rateLimit.js';
+import { disconnectPrisma } from './lib/prisma.js';
 
 const fastify = Fastify({
   logger: true,
@@ -61,5 +62,22 @@ const start = async () => {
     process.exit(1);
   }
 };
+
+// Graceful shutdown
+const gracefulShutdown = async (signal: string) => {
+  console.log(`Received ${signal}, shutting down gracefully...`);
+  try {
+    await fastify.close();
+    await disconnectPrisma();
+    console.log('Server closed successfully');
+    process.exit(0);
+  } catch (err) {
+    console.error('Error during shutdown:', err);
+    process.exit(1);
+  }
+};
+
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
 
 start();

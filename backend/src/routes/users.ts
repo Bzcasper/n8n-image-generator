@@ -1,8 +1,7 @@
 import { FastifyInstance } from 'fastify';
-import { PrismaClient } from '@prisma/client';
 import { authenticate } from '../middleware/auth.js';
-
-const prisma = new PrismaClient();
+import { createImageSchema } from '../utils/validation.js';
+import { prisma } from '../lib/prisma.js';
 
 export async function userRoutes(fastify: FastifyInstance) {
   // Get user's generated images
@@ -13,7 +12,7 @@ export async function userRoutes(fastify: FastifyInstance) {
       const images = await prisma.generatedImage.findMany({
         where: { userId: request.user!.userId },
         orderBy: { createdAt: 'desc' },
-        take: 50, // Limit to recent 50 images
+        take: 50,
       });
 
       reply.send({ images });
@@ -27,16 +26,18 @@ export async function userRoutes(fastify: FastifyInstance) {
   fastify.post('/images', {
     preHandler: authenticate,
   }, async (request, reply) => {
-    try {
-      const { prompt, imageUrl, style, size, quality, seed } = request.body as {
-        prompt: string;
-        imageUrl: string;
-        style?: string;
-        size?: string;
-        quality?: string;
-        seed?: number;
-      };
+    const validation = createImageSchema.safeParse(request.body);
 
+    if (!validation.success) {
+      return reply.code(400).send({
+        error: 'Validation failed',
+        details: validation.error.issues,
+      });
+    }
+
+    const { prompt, imageUrl, style, size, quality, seed } = validation.data;
+
+    try {
       const image = await prisma.generatedImage.create({
         data: {
           userId: request.user!.userId,

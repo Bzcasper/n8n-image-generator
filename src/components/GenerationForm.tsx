@@ -105,12 +105,12 @@ const GenerationForm: React.FC<GenerationFormProps> = ({ onGenerate, isLoading, 
 
         <div className="space-y-3">
           <label className="block text-[11px] font-black font-varela text-navy uppercase tracking-widest">Art Style</label>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 overflow-y-auto max-h-[120px] pr-1 custom-scrollbar">
+          <div className="grid grid-cols-2 gap-3 overflow-y-auto max-h-[120px] pr-1 custom-scrollbar">
             {STYLE_OPTIONS.map((option) => (
-              <label key={option.value} className={`group flex flex-col items-center justify-center p-2 border-2 rounded-xl cursor-pointer transition-all duration-200 ${
-                style === option.value 
-                  ? 'border-blue bg-blue/5 shadow-md scale-105' 
-                  : 'border-navy/5 hover:border-blue/30 bg-white'
+              <label key={option.value} className={`group flex flex-col items-center justify-center p-3 border-2 rounded-16 cursor-pointer transition-all duration-300 relative overflow-hidden ${
+                style === option.value
+                  ? 'border-blue bg-blue/5 shadow-md scale-105'
+                  : 'border-navy/5 bg-white'
               }`}>
                 <input
                   type="radio"
@@ -120,9 +120,16 @@ const GenerationForm: React.FC<GenerationFormProps> = ({ onGenerate, isLoading, 
                   onChange={(e) => setStyle(e.target.value)}
                   className="sr-only"
                 />
-                <span className={`text-[10px] font-black font-sniglet text-center ${style === option.value ? 'text-blue' : 'text-slate-600'}`}>
+                <span className={`text-sm font-black font-sniglet text-center relative z-20 transition-opacity duration-300 ${style === option.value ? 'text-blue' : 'text-slate-600 group-hover:opacity-0'}`}>
                   {option.label}
                 </span>
+                <span className={`absolute inset-0 z-20 flex items-center justify-center text-sm font-black font-sniglet text-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none`}>
+                  <span className="bg-gradient-to-r from-[#00B4FF] via-[#48E5B6] to-[#006D88] bg-clip-text text-transparent">
+                    {option.label}
+                  </span>
+                </span>
+                <div className={`absolute inset-0 z-10 bg-white opacity-0 transition-opacity duration-800 rounded-16 ${style === option.value ? '' : 'group-hover:opacity-100'}`}></div>
+                <div className={`absolute inset-0 z-10 border-2 border-transparent rounded-16 transition-all duration-500 ${style === option.value ? '' : 'group-hover:border-[#00B4FF] group-hover:animate-border-draw group-hover:shadow-[0_0_20px_rgba(0,180,255,0.4),0_0_40px_rgba(72,229,182,0.3),0_0_60px_rgba(0,109,136,0.2)]'}`}></div>
               </label>
             ))}
           </div>
@@ -130,12 +137,12 @@ const GenerationForm: React.FC<GenerationFormProps> = ({ onGenerate, isLoading, 
 
         <div className="space-y-3">
           <label className="block text-[11px] font-black font-varela text-navy uppercase tracking-widest">Dimensions</label>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {SIZE_OPTIONS.map((option) => (
-              <label key={option.value} className={`group flex flex-col items-center justify-center p-2 border-2 rounded-xl cursor-pointer transition-all duration-200 ${
-                size === option.value 
-                  ? 'border-mint bg-mint/5 shadow-md scale-105' 
-                  : 'border-navy/5 hover:border-mint/30 bg-white'
+              <label key={option.value} className={`group flex flex-col items-center justify-center p-3 border-2 rounded-16 cursor-pointer transition-all duration-300 relative overflow-hidden ${
+                size === option.value
+                  ? 'border-mint bg-mint/5 shadow-md scale-105'
+                  : 'border-navy/5 bg-white'
               }`}>
                 <input
                   type="radio"
@@ -145,10 +152,22 @@ const GenerationForm: React.FC<GenerationFormProps> = ({ onGenerate, isLoading, 
                   onChange={(e) => setSize(e.target.value)}
                   className="sr-only"
                 />
-                <span className={`text-[10px] font-black font-sniglet text-center ${size === option.value ? 'text-mint' : 'text-slate-600'}`}>
+                <span className={`text-sm font-black font-sniglet text-center relative z-20 transition-opacity duration-300 ${size === option.value ? 'text-mint' : 'text-slate-600 group-hover:opacity-0'}`}>
                   {option.label}
                 </span>
-                <span className="text-[8px] font-bold font-varela text-slate-400">{option.description}</span>
+                <span className={`text-xs font-bold font-varela text-center relative z-20 transition-opacity duration-300 ${size === option.value ? 'text-navy/40' : 'text-slate-400 group-hover:opacity-0'}`}>
+                  {option.description}
+                </span>
+                <span className="absolute inset-0 z-20 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                  <span className="text-sm font-black font-sniglet text-center bg-gradient-to-r from-[#00B4FF] via-[#48E5B6] to-[#006D88] bg-clip-text text-transparent">
+                    {option.label}
+                  </span>
+                  <span className="text-xs font-bold font-varela text-center text-navy/40">
+                    {option.description}
+                  </span>
+                </span>
+                <div className={`absolute inset-0 z-10 bg-white opacity-0 transition-opacity duration-800 rounded-16 ${size === option.value ? '' : 'group-hover:opacity-100'}`}></div>
+                <div className={`absolute inset-0 z-10 border-2 border-transparent rounded-16 transition-all duration-500 ${size === option.value ? '' : 'group-hover:border-[#48E5B6] group-hover:animate-border-draw group-hover:shadow-[0_0_20px_rgba(72,229,182,0.4),0_0_40px_rgba(0,180,255,0.3),0_0_60px_rgba(0,109,136,0.2)]'}`}></div>
               </label>
             ))}
           </div>

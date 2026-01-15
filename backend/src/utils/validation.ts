@@ -34,6 +34,16 @@ export const resetPasswordSchema = z.object({
   newPassword: z.string().min(8, 'Password must be at least 8 characters'),
 });
 
+// User routes validation schemas
+export const createImageSchema = z.object({
+  prompt: z.string().min(1, 'Prompt is required'),
+  imageUrl: z.string().url('Invalid image URL'),
+  style: z.string().optional(),
+  size: z.string().optional(),
+  quality: z.string().optional(),
+  seed: z.number().optional(),
+});
+
 // Type exports
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
@@ -41,3 +51,4 @@ export type RefreshTokenInput = z.infer<typeof refreshTokenSchema>;
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
 export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
 export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
+export type CreateImageInput = z.infer<typeof createImageSchema>;

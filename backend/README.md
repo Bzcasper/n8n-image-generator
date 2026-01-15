@@ -202,6 +202,54 @@ EMAIL_FROM="YourApp <noreply@yourdomain.com>"
 3. Generate a new app password for "Mail"
 4. Use the generated password for `EMAIL_PASS`
 
+#### Redis (for shared rate limiting)
+
+```env
+# Redis URL format: redis://[password@]host:port or rediss://[password@]host:port for TLS
+# Get Redis from: Redis Cloud, Upstash, or self-hosted Redis
+REDIS_URL="redis://localhost:6379"
+```
+
+**Setting up Redis for production:**
+
+**Option 1: Redis Cloud (Free tier available)**
+1. Go to [Redis Cloud](https://redis.com/try-free)
+2. Create a new database
+3. Copy the connection URL to `REDIS_URL`
+4. For TLS connections, use `rediss://` instead of `redis://`
+
+**Option 2: Upstash (Redis-compatible, great for edge)**
+1. Go to [Upstash Console](https://console.upstash.com)
+2. Create a new Redis database
+3. Copy the REST URL and convert to Redis URL format
+4. Use the format: `redis://default:PASSWORD@HOST:PORT`
+
+**Option 3: Self-hosted Redis (Docker)**
+```bash
+# Run Redis locally with Docker
+docker run -d -p 6379:6379 redis:7-alpine
+
+# Or use Docker Compose for production
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+volumes:
+  redis_data:
+```
+
+**Redis Fallback Behavior:**
+- If `REDIS_URL` is not configured, the backend will use in-memory rate limiting
+- If Redis connection fails, the backend automatically falls back to in-memory storage
+- Fallback mode is logged to console for monitoring
+- In-memory fallback is suitable for development but not recommended for production with multiple instances
+
+**Note:** For production deployments with PM2, Docker Swarm, or Kubernetes, Redis is strongly recommended to ensure consistent rate limiting across all instances.
+
 #### Security Settings
 
 ```env

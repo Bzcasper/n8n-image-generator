@@ -116,7 +116,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Enhanced prompt processing and API configuration\nconst originalPrompt = $input.first().json.query.message;\nconst style = $input.first().json.query.style || 'photorealistic';\nconst size = $input.first().json.query.size || '1024x1024';\nconst seed = $input.first().json.query.seed || Math.floor(Math.random() * 1000000);\nconst model = $input.first().json.query.model || 'flux';\nconst quality = $input.first().json.query.quality || 'high';\n\n// Content filtering - basic inappropriate content detection\nconst inappropriateTerms = ['nude', 'naked', 'nsfw', 'explicit', 'sexual', 'porn', 'xxx'];\nconst containsInappropriate = inappropriateTerms.some(term => \n  originalPrompt.toLowerCase().includes(term.toLowerCase())\n);\n\nif (containsInappropriate) {\n  return {\n    error: 'Content policy violation',\n    message: 'The prompt contains inappropriate content that cannot be processed.',\n    code: 'CONTENT_VIOLATION'\n  };\n}\n\n// Enhanced prompt based on style with better descriptions\nlet enhancedPrompt = originalPrompt;\nlet styleModifiers = '';\n\nswitch(style.toLowerCase()) {\n  case 'artistic':\n    styleModifiers = 'oil painting, masterpiece, highly detailed, vibrant colors, professional artwork, fine art';\n    break;\n  case 'photorealistic':\n    styleModifiers = 'photorealistic, high resolution, professional photography, 8k, ultra-detailed, sharp focus';\n    break;\n  case 'cartoon':\n    styleModifiers = 'cartoon style, animated, colorful, Disney-like, cel-shaded, illustration';\n    break;\n  case 'cyberpunk':\n    styleModifiers = 'cyberpunk style, neon lights, futuristic, dark atmosphere, sci-fi, digital art';\n    break;\n  case 'fantasy':\n    styleModifiers = 'fantasy art, magical, mystical, epic, detailed fantasy illustration';\n    break;\n  case 'minimalist':\n    styleModifiers = 'minimalist, clean, simple, elegant, modern design';\n    break;\n  case 'vintage':\n    styleModifiers = 'vintage style, retro, classic, aged, nostalgic';\n    break;\n  default:\n    styleModifiers = 'high quality, detailed, professional';\n}\n\n// Quality modifiers\nlet qualityModifiers = '';\nswitch(quality.toLowerCase()) {\n  case 'high':\n    qualityModifiers = 'best quality, ultra detailed, 4k, hdr';\n    break;\n  case 'medium':\n    qualityModifiers = 'good quality, detailed';\n    break;\n  case 'low':\n    qualityModifiers = 'standard quality';\n    break;\n}\n\nenhancedPrompt = `${originalPrompt}, ${styleModifiers}, ${qualityModifiers}`;\n\n// Parse size\nconst [width, height] = size.split('x').map(Number);\n\n// Validate dimensions\nif (width > 2048 || height > 2048 || width < 256 || height < 256) {\n  return {\n    error: 'Invalid dimensions',\n    message: 'Image dimensions must be between 256x256 and 2048x2048',\n    code: 'INVALID_DIMENSIONS'\n  };\n}\n\n// Multiple API providers for better reliability\nconst apiConfigs = [\n  {\n    name: 'Pollinations AI - Flux',\n    url: `https://image.pollinations.ai/prompt/${encodeURIComponent(enhancedPrompt)}?model=flux&width=${width}&height=${height}&seed=${seed}&enhance=true`,\n    priority: 1\n  },\n  {\n    name: 'Pollinations AI - Turbo',\n    url: `https://image.pollinations.ai/prompt/${encodeURIComponent(enhancedPrompt)}?model=turbo&width=${width}&height=${height}&seed=${seed}`,\n    priority: 2\n  },\n  {\n    name: 'Pollinations AI - Default',\n    url: `https://image.pollinations.ai/prompt/${encodeURIComponent(enhancedPrompt)}?width=${width}&height=${height}&seed=${seed}`,\n    priority: 3\n  }\n];\n\nreturn {\n  originalPrompt,\n  enhancedPrompt,\n  style,\n  size,\n  width,\n  height,\n  seed,\n  model,\n  quality,\n  apiConfigs,\n  timestamp: new Date().toISOString(),\n  requestId: `img_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`\n};"
+        "jsCode": "// Enhanced prompt processing and API configuration\nconst originalPrompt = $input.first().json.query.message;\nconst style = $input.first().json.query.style || 'photorealistic';\nconst size = $input.first().json.query.size || '1024x1024';\nconst seed = $input.first().json.query.seed || Math.floor(Math.random() * 1000000);\nconst model = $input.first().json.query.model || 'flux';\nconst quality = $input.first().json.query.quality || 'high';\n\n// Content filtering - basic inappropriate content detection\nconst inappropriateTerms = ['nude', 'naked', 'nsfw', 'explicit', 'sexual', 'porn', 'xxx'];\nconst containsInappropriate = inappropriateTerms.some(term => \n  originalPrompt.toLowerCase().includes(term.toLowerCase())\n);\n\nif (containsInappropriate) {\n  return {\n    error: 'Content policy violation',\n    message: 'The prompt contains inappropriate content that cannot be processed.',\n    code: 'CONTENT_VIOLATION'\n  };\n}\n\n// Enhanced prompt based on style with better descriptions\nlet enhancedPrompt = originalPrompt;\nlet styleModifiers = '';\n\nswitch(style.toLowerCase()) {\n  case 'artistic':\n    styleModifiers = 'oil painting, masterpiece, highly detailed, vibrant colors, professional artwork, fine art';\n    break;\n  case 'photorealistic':\n    styleModifiers = 'photorealistic, high resolution, professional photography, 8k, ultra-detailed, sharp focus';\n    break;\n  case 'cartoon':\n    styleModifiers = 'cartoon style, animated, colorful, Disney-like, cel-shaded, illustration';\n    break;\n  case 'cyberpunk':\n    styleModifiers = 'cyberpunk style, neon lights, futuristic, dark atmosphere, sci-fi, digital art';\n    break;\n  case 'fantasy':\n    styleModifiers = 'fantasy art, magical, mystical, epic, detailed fantasy illustration';\n    break;\n  case 'minimalist':\n    styleModifiers = 'minimalist, clean, simple, elegant, modern design';\n    break;\n  case 'vintage':\n    styleModifiers = 'vintage style, retro, classic, aged, nostalgic';\n    break;\n  default:\n    styleModifiers = 'high quality, detailed, professional';\n}\n\n// Quality modifiers\nlet qualityModifiers = '';\nswitch(quality.toLowerCase()) {\n  case 'high':\n    qualityModifiers = 'best quality, ultra detailed, 4k, hdr';\n    break;\n  case 'medium':\n    qualityModifiers = 'good quality, detailed';\n    break;\n  case 'low':\n    qualityModifiers = 'standard quality';\n    break;\n}\n\nenhancedPrompt = `${originalPrompt}, ${styleModifiers}, ${qualityModifiers}`;\n\n// Parse size\nconst [width, height] = size.split('x').map(Number);\n\n// Validate dimensions\nif (width > 2048 || height > 2048 || width < 256 || height < 256) {\n  return {\n    error: 'Invalid dimensions',\n    message: 'Image dimensions must be between 256x256 and 2048x2048',\n    code: 'INVALID_DIMENSIONS'\n  };\n}\n\n// Multiple API providers for better reliability\nconst apiConfigs = [\n  {\n    name: 'Pollinations AI - Flux',\n    url: `https://image.pollinations.ai/prompt/${encodeURIComponent(enhancedPrompt)}?model=flux&width=${width}&height=${height}&seed=${seed}&enhance=true`,\n    priority: 1\n  },\n  {\n    name: 'Pollinations AI - Turbo',\n    url: `https://image.pollinations.ai/prompt/${encodeURIComponent(enhancedPrompt)}?model=turbo&width=${width}&height=${height}&seed=${seed}`,\n    priority: 2\n  },\n  {\n    name: 'Pollinations AI - Default',\n    url: `https://image.pollinations.ai/prompt/${encodeURIComponent(enhancedPrompt)}?width=${width}&height=${height}&seed=${seed}`,\n    priority: 3\n  }\n];\n\nreturn {\n  originalPrompt,\n  enhancedPrompt,\n  style,\n  size,\n  width,\n  height,\n  seed,\n  model,\n  quality,\n  apiConfigs,\n  currentApiIndex: 0,\n  retryCount: 0,\n  maxRetries: 3,\n  timestamp: new Date().toISOString(),\n  requestId: `img_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`\n};"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -161,7 +161,7 @@
     },
     {
       "parameters": {
-        "url": "={{ $json.apiConfigs[0].url }}",
+        "url": "={{ $json.apiConfigs[$json.currentApiIndex].url }}",
         "options": {
           "timeout": 45000
         }
@@ -173,7 +173,8 @@
         0
       ],
       "id": "cdece44a-4548-4074-a47e-d4899e196449",
-      "name": "Primary Image API"
+      "name": "Primary Image API",
+      "continueOnFail": true
     },
     {
       "parameters": {
@@ -228,6 +229,124 @@
       ],
       "id": "49113634-2a58-4fd1-ad35-55d261737604",
       "name": "Content Error Response"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Check if the HTTP request failed\nconst inputData = $input.first();\nconst hasError = inputData.json.error !== undefined;\nconst statusCode = inputData.json.statusCode || inputData.json.code;\n\nif (hasError || statusCode >= 400) {\n  // Determine error type\n  let errorType = 'unknown';\n  let errorMessage = inputData.json.message || 'Unknown error';\n  \n  if (statusCode === 408 || errorMessage.includes('timeout')) {\n    errorType = 'timeout';\n  } else if (statusCode >= 500) {\n    errorType = 'server_error';\n  } else if (statusCode >= 400) {\n    errorType = 'client_error';\n  }\n  \n  return {\n    hasError: true,\n    errorType,\n    statusCode,\n    errorMessage,\n    originalData: inputData.json\n  };\n}\n\nreturn {\n  hasError: false,\n  statusCode: 200,\n  originalData: inputData.json\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        500,
+        100
+      ],
+      "id": "f1e2d3c4-b5a6-4789-0123-456789abcdef0",
+      "name": "Error Detector"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "error-check",
+              "leftValue": "={{ $json.hasError }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equal"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        680,
+        100
+      ],
+      "id": "a1b2c3d4-e5f6-4789-0123-456789abcdef1",
+      "name": "Error Check"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Retry logic with exponential backoff\nconst inputData = $input.first().json;\nconst currentApiIndex = inputData.currentApiIndex || 0;\nconst retryCount = inputData.retryCount || 0;\nconst maxRetries = inputData.maxRetries || 3;\nconst apiConfigs = inputData.apiConfigs || [];\n\n// Check if we can retry\nconst canRetry = retryCount < maxRetries && currentApiIndex < apiConfigs.length;\n\nif (canRetry) {\n  // Calculate exponential backoff delay (in ms)\n  const baseDelay = 1000; // 1 second\n  const backoffDelay = baseDelay * Math.pow(2, retryCount);\n  \n  // Determine next API to try\n  const nextApiIndex = (currentApiIndex + 1) % apiConfigs.length;\n  const nextRetryCount = nextApiIndex === 0 ? retryCount + 1 : retryCount;\n  \n  return {\n    shouldRetry: true,\n    nextApiIndex,\n    nextRetryCount,\n    backoffDelay,\n    currentApiIndex,\n    retryCount,\n    maxRetries,\n    apiConfigs,\n    originalPrompt: inputData.originalPrompt,\n    enhancedPrompt: inputData.enhancedPrompt,\n    style: inputData.style,\n    size: inputData.size,\n    width: inputData.width,\n    height: inputData.height,\n    seed: inputData.seed,\n    model: inputData.model,\n    quality: inputData.quality,\n    requestId: inputData.requestId,\n    timestamp: inputData.timestamp,\n    lastError: inputData.errorMessage || 'Unknown error',\n    lastStatusCode: inputData.statusCode\n  };\n}\n\n// Cannot retry anymore\nreturn {\n  shouldRetry: false,\n  currentApiIndex,\n  retryCount,\n  maxRetries,\n  apiConfigs,\n  originalPrompt: inputData.originalPrompt,\n  enhancedPrompt: inputData.enhancedPrompt,\n  requestId: inputData.requestId,\n  timestamp: inputData.timestamp,\n  lastError: inputData.errorMessage || 'Unknown error',\n  lastStatusCode: inputData.statusCode,\n  error: 'All retry attempts exhausted'\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        860,
+        200
+      ],
+      "id": "b2c3d4e5-f6a7-4789-0123-456789abcdef2",
+      "name": "Retry Logic"
+    },
+    {
+      "parameters": {
+        "amount": 1,
+        "unit": "seconds"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1040,
+        200
+      ],
+      "id": "c3d4e5f6-a7b8-4789-0123-456789abcdef3",
+      "name": "Backoff Delay"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "retry-check",
+              "leftValue": "={{ $json.shouldRetry }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equal"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1220,
+        200
+      ],
+      "id": "d4e5f6a7-b8c9-4789-0123-456789abcdef4",
+      "name": "Retry Decision"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"error\": true,\n  \"message\": \"Failed to generate image after multiple attempts\",\n  \"code\": \"GENERATION_FAILED\",\n  \"details\": {\n    \"requestId\": \"={{ $json.requestId }}\",\n    \"attempts\": \"={{ $json.retryCount + 1 }}\",\n    \"lastError\": \"={{ $json.lastError }}\",\n    \"lastStatusCode\": \"={{ $json.lastStatusCode }}\",\n    \"timestamp\": \"={{ $json.timestamp }}\"\n  }\n}"
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1400,
+        300
+      ],
+      "id": "e5f6a7b8-c9d0-4789-0123-456789abcdef5",
+      "name": "Error Response"
     }
   ],
   "pinData": {},
@@ -323,7 +442,76 @@
       "main": [
         [
           {
+            "node": "Error Detector",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error Detector": {
+      "main": [
+        [
+          {
+            "node": "Error Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error Check": {
+      "main": [
+        [
+          {
+            "node": "Retry Logic",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
             "node": "Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retry Logic": {
+      "main": [
+        [
+          {
+            "node": "Backoff Delay",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Backoff Delay": {
+      "main": [
+        [
+          {
+            "node": "Retry Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retry Decision": {
+      "main": [
+        [
+          {
+            "node": "Primary Image API",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error Response",
             "type": "main",
             "index": 0
           }
@@ -331,7 +519,7 @@
       ]
     }
   },
-  "active": false,
+  "active": true,
   "settings": {
     "executionOrder": "v1"
   },

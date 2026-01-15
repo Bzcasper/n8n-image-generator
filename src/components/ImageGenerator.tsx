@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import Header from './Header';
 import GenerationForm from './GenerationForm';
 import ImageDisplay from './ImageDisplay';
@@ -16,8 +16,38 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({ onBackToLanding }) => {
   const [imageHistory, setImageHistory] = useState<GeneratedImage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const { isAuthenticated, accessToken, isLoading: authLoading } = useAuth();
+  const abortControllerRef = React.useRef<AbortController | null>(null);
+  const objectUrlsRef = React.useRef<Set<string>>(new Set());
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!containerRef.current) return;
+      const { clientX, clientY } = e;
+      const { innerWidth, innerHeight } = window;
+
+      const x = (clientX / innerWidth) * 2 - 1;
+      const y = (clientY / innerHeight) * 2 - 1;
+
+      setMousePos({ x, y });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+      objectUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
+      objectUrlsRef.current.clear();
+    };
+  }, []);
 
   const fetchUserImages = useCallback(async () => {
     if (!accessToken) return;
@@ -49,6 +79,14 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({ onBackToLanding }) => {
     setIsLoading(true);
     setError(null);
 
+    const abortController = new AbortController();
+    abortControllerRef.current = abortController;
+
+    const timeoutId = setTimeout(() => {
+      abortController.abort();
+      setError('Image generation timed out. Please try again.');
+    }, 60000);
+
     try {
       const webhookUrl = import.meta.env.VITE_N8N_WEBHOOK_URL;
 
@@ -56,8 +94,11 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({ onBackToLanding }) => {
         throw new Error('Webhook URL not configured. Please set VITE_N8N_WEBHOOK_URL in your .env file.');
       }
 
+      // Sanitize input by trimming whitespace
+      const sanitizedMessage = params.message.trim();
+
       const queryParams = new URLSearchParams({
-        message: params.message,
+        message: sanitizedMessage,
         style: params.style,
         size: params.size,
         quality: params.quality,
@@ -70,6 +111,7 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({ onBackToLanding }) => {
         headers: {
           'Content-Type': 'application/json',
         },
+        signal: abortController.signal,
       });
 
       if (!response.ok) {
@@ -97,6 +139,8 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({ onBackToLanding }) => {
       setCurrentImage(generatedImage);
       setImageHistory((prev) => [generatedImage, ...prev]);
 
+      objectUrlsRef.current.add(imageUrl);
+
       sessionImageCache.addImage(generatedImage);
 
       await fetch('/api/increment-generation', {
@@ -117,8 +161,14 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({ onBackToLanding }) => {
         }).catch((err) => console.error('Failed to save image:', err));
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An unexpected error occurred');
+      if (err instanceof Error && err.name === 'AbortError') {
+        setError('Image generation timed out. Please try again.');
+      } else {
+        setError(err instanceof Error ? err.message : 'An unexpected error occurred');
+      }
     } finally {
+      clearTimeout(timeoutId);
+      abortControllerRef.current = null;
       setIsLoading(false);
     }
   }, [isAuthenticated, accessToken]);
@@ -145,10 +195,32 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({ onBackToLanding }) => {
   }, []);
 
   return (
-    <div className="h-screen bg-[#F0F2F5] relative overflow-hidden flex flex-col">
+    <div
+      ref={containerRef}
+      className="h-screen bg-[#F0F2F5] relative overflow-hidden flex flex-col"
+    >
       {/* Dynamic Background Blobs */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40vw] h-[40vw] rounded-full blur-[120px] opacity-20 bg-mint pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40vw] h-[40vw] rounded-full blur-[120px] opacity-20 bg-blue pointer-events-none" />
+      <div
+        className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full blur-[120px] opacity-40 mix-blend-multiply transition-transform duration-75 ease-out will-change-transform pointer-events-none"
+        style={{
+          backgroundColor: '#48E5B6',
+          transform: `translate(${mousePos.x * -40}px, ${mousePos.y * -40}px)`
+        }}
+      />
+      <div
+        className="absolute bottom-[-10%] right-[-10%] w-[60vw] h-[60vw] rounded-full blur-[140px] opacity-40 mix-blend-multiply transition-transform duration-100 ease-out will-change-transform pointer-events-none"
+        style={{
+          backgroundColor: '#00B4FF',
+          transform: `translate(${mousePos.x * 50}px, ${mousePos.y * 50}px)`
+        }}
+      />
+      <div
+        className="absolute top-[20%] right-[20%] w-[30vw] h-[30vw] rounded-full blur-[100px] opacity-30 mix-blend-multiply transition-transform duration-150 ease-out will-change-transform pointer-events-none"
+        style={{
+          backgroundColor: '#006D88',
+          transform: `translate(${mousePos.x * -20}px, ${mousePos.y * -20}px)`
+        }}
+      />
 
       <div className="relative z-10 flex flex-col h-full">
         <Header onBackToLanding={onBackToLanding} />

@@ -45,6 +45,7 @@ model Session {
 
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId])
   @@map("sessions")
 }
 
@@ -61,5 +62,6 @@ model GeneratedImage {
 
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId])
   @@map("generated_images")
 }
