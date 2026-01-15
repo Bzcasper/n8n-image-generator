@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from './Header';
 import GenerationForm from './GenerationForm';
 import ImageDisplay from './ImageDisplay';
@@ -20,6 +21,7 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({ onBackToLanding }) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const { isAuthenticated, accessToken, isLoading: authLoading } = useAuth();
+  const navigate = useNavigate();
   const abortControllerRef = React.useRef<AbortController | null>(null);
   const objectUrlsRef = React.useRef<Set<string>>(new Set());
 
@@ -106,7 +108,7 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({ onBackToLanding }) => {
         seed: params.seed.toString(),
       });
 
-      const response = await fetch(`${webhookUrl}?${queryParams}`, {
+      const response = await fetch(`${webhookUrl}/generate-image?${queryParams}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -223,6 +225,15 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({ onBackToLanding }) => {
       />
 
       <div className="relative z-10 flex flex-col h-full">
+        <button
+          onClick={() => navigate('/account/profile')}
+          className="absolute top-4 right-4 z-20 px-4 py-2 rounded-16 font-varela font-bold text-white shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 active:scale-95"
+          style={{
+            background: 'linear-gradient(135deg, #48E5B6 0%, #00B4FF 100%)',
+          }}
+        >
+          Dashboard
+        </button>
         <Header onBackToLanding={onBackToLanding} />
 
         <main className="flex-grow flex flex-col px-4 md:px-6 py-4">

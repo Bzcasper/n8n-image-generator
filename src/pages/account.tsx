@@ -1,8 +1,9 @@
 import { AccountView } from '@neondatabase/neon-js/auth/react/ui';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 export function Account() {
   const { pathname } = useParams();
+  const navigate = useNavigate();
   return (
     <div
       style={{
@@ -22,7 +23,7 @@ export function Account() {
           cursor: 'pointer',
           transition: 'transform 0.3s',
         }}
-        onClick={() => window.location.href = '/'}
+        onClick={() => navigate('/')}
         onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
         onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
       >

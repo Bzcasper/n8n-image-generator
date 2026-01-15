@@ -6,7 +6,14 @@
 app = 'n8n-image-generator'
 primary_region = 'sjc'
 
+# Define processes
+[processes]
+  app = 'nginx -g "daemon off;"'
+  backend = 'node dist/server.js'
+
+# Frontend service (React + Vite)
 [build]
+  dockerfile = 'Dockerfile'
 
 [http_service]
   internal_port = 80
@@ -21,3 +28,43 @@ primary_region = 'sjc'
   cpu_kind = 'shared'
   cpus = 1
   memory_mb = 1024
+  processes = ['app']
+
+# Backend service (Fastify + Node.js)
+[[services]]
+  internal_port = 3001
+  processes = ['backend']
+  protocol = 'tcp'
+
+  [[services.ports]]
+    handlers = ['http']
+    port = 80
+    force_https = true
+
+  [[services.ports]]
+    handlers = ['tls', 'http']
+    port = 443
+
+  [[services.tcp_checks]]
+    interval = '15s'
+    timeout = '2s'
+    grace_period = '30s'
+
+  [[services.http_checks]]
+    path = '/health'
+    interval = '15s'
+    timeout = '2s'
+    grace_period = '30s'
+
+[[vm]]
+  memory = '512mb'
+  cpu_kind = 'shared'
+  cpus = 1
+  memory_mb = 512
+  processes = ['backend']
+
+# Environment variables (set via fly secrets)
+[env]
+  NODE_ENV = 'production'
+  PORT = '3001'
+  FRONTEND_URL = 'https://n8n-image-generator.fly.dev'

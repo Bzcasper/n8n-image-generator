@@ -1,15 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Sparkles, Zap, Shield, Loader2 } from 'lucide-react';
-import { SignedIn, SignedOut } from '@neondatabase/neon-js/auth/react/ui';
-import { authClient } from '../lib/auth';
+import { useAuth } from '../lib/backendAuth';
 
 export function Home() {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
-  
-  const session = authClient.useSession();
+
+  const { isAuthenticated, isLoading } = useAuth();
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -31,7 +30,7 @@ export function Home() {
     navigate('/app');
   };
 
-  if (session.isPending) {
+  if (isLoading) {
     return (
       <div style={{
         display: 'flex',
@@ -106,26 +105,25 @@ export function Home() {
           <div className="absolute inset-0 z-10 border-2 border-transparent rounded-lg transition-all duration-500 group-hover:border-[#00B4FF] group-hover:animate-border-draw group-hover:shadow-[0_0_20px_rgba(0,180,255,0.4),0_0_40px_rgba(72,229,182,0.3),0_0_60px_rgba(0,109,136,0.2)]"></div>
         </button>
         
-        <SignedIn>
-          <button 
-            onClick={() => navigate('/account/profile')} 
+        {isAuthenticated ? (
+          <button
+            onClick={() => navigate('/account/profile')}
             className="relative px-5 py-2 text-base font-bold font-varela uppercase tracking-wider border-2 border-black/20 rounded-lg transition-all duration-300 hover:border-[#48E5B6] active:scale-95 group overflow-hidden"
           >
             <span className="relative z-20 bg-gradient-to-r from-[#48E5B6] via-[#00B4FF] to-[#006D88] bg-clip-text text-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">Account</span>
             <span className="absolute inset-0 z-20 flex items-center justify-center text-black group-hover:opacity-0 transition-opacity duration-300">Account</span>
             <div className="absolute inset-0 z-10 bg-white opacity-0 group-hover:opacity-100 transition-opacity duration-800 rounded-lg"></div>
           </button>
-        </SignedIn>
-        <SignedOut>
-          <button 
-            onClick={() => navigate('/auth/sign-in')} 
+        ) : (
+          <button
+            onClick={() => navigate('/auth/sign-in')}
             className="relative px-5 py-2 text-base font-bold font-varela uppercase tracking-wider border-2 border-black/20 rounded-lg transition-all duration-300 hover:border-[#48E5B6] active:scale-95 group overflow-hidden"
           >
             <span className="relative z-20 bg-gradient-to-r from-[#48E5B6] via-[#00B4FF] to-[#006D88] bg-clip-text text-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">Sign In</span>
             <span className="absolute inset-0 z-20 flex items-center justify-center text-black group-hover:opacity-0 transition-opacity duration-300">Sign In</span>
             <div className="absolute inset-0 z-10 bg-white opacity-0 group-hover:opacity-100 transition-opacity duration-800 rounded-lg"></div>
           </button>
-        </SignedOut>
+        )}
       </nav>
 
       {/* Main Content */}
