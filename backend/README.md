@@ -22,6 +22,8 @@ A comprehensive backend API for the SplashTool AI image generation platform, bui
 
 ## Quick Start
 
+### Development Setup
+
 1. **Install dependencies:**
    ```bash
    npm install
@@ -43,6 +45,53 @@ A comprehensive backend API for the SplashTool AI image generation platform, bui
    ```bash
    npm run dev
    ```
+
+### Production Deployment
+
+1. **Environment Setup:**
+   ```bash
+   # Set production environment variables
+   export NODE_ENV=production
+   export DATABASE_URL="your-production-database-url"
+   export JWT_SECRET="your-production-jwt-secret"
+   export JWT_REFRESH_SECRET="your-production-refresh-secret"
+   ```
+
+2. **Deploy using the script:**
+   ```bash
+   chmod +x deploy.sh
+   ./deploy.sh
+   ```
+
+3. **Or manual deployment:**
+   ```bash
+   npm ci --only=production
+   npx prisma generate
+   npx prisma db push
+   npm run build
+   npm start
+   ```
+
+### Testing Authentication
+
+```bash
+# Test health endpoint
+curl http://localhost:3001/health
+
+# Register a user
+curl -X POST http://localhost:3001/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","password":"password123","username":"testuser"}'
+
+# Login
+curl -X POST http://localhost:3001/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","password":"password123"}'
+
+# Access protected route
+curl -X GET http://localhost:3001/api/auth/me \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
 
 ## API Endpoints
 

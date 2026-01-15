@@ -26,8 +26,17 @@ export async function authRoutes(fastify: FastifyInstance) {
   // User registration
   fastify.post('/register', async (request, reply) => {
     try {
-      const body = request.body as RegisterInput;
-      const { email, password, username, firstName, lastName } = body;
+      const body = request.body as any;
+      const validation = registerSchema.safeParse(body);
+
+      if (!validation.success) {
+        return reply.code(400).send({
+          error: 'Validation failed',
+          details: validation.error.issues
+        });
+      }
+
+      const { email, password, username, firstName, lastName } = validation.data;
 
       // Check if user already exists
       const existingUser = await prisma.user.findFirst({
@@ -98,8 +107,17 @@ export async function authRoutes(fastify: FastifyInstance) {
   // User login
   fastify.post('/login', async (request, reply) => {
     try {
-      const body = request.body as LoginInput;
-      const { email, password } = body;
+      const body = request.body as any;
+      const validation = loginSchema.safeParse(body);
+
+      if (!validation.success) {
+        return reply.code(400).send({
+          error: 'Validation failed',
+          details: validation.error.issues
+        });
+      }
+
+      const { email, password } = validation.data;
 
       // Find user
       const user = await prisma.user.findUnique({
@@ -162,8 +180,17 @@ export async function authRoutes(fastify: FastifyInstance) {
   // Refresh access token
   fastify.post('/refresh', async (request, reply) => {
     try {
-      const body = request.body as RefreshTokenInput;
-      const { refreshToken } = body;
+      const body = request.body as any;
+      const validation = refreshTokenSchema.safeParse(body);
+
+      if (!validation.success) {
+        return reply.code(400).send({
+          error: 'Validation failed',
+          details: validation.error.issues
+        });
+      }
+
+      const { refreshToken } = validation.data;
 
       // Verify refresh token
       const payload = verifyRefreshToken(refreshToken);
@@ -257,7 +284,17 @@ export async function authRoutes(fastify: FastifyInstance) {
     preHandler: authenticate,
   }, async (request, reply) => {
     try {
-      const updates = request.body as UpdateProfileInput;
+      const body = request.body as any;
+      const validation = updateProfileSchema.safeParse(body);
+
+      if (!validation.success) {
+        return reply.code(400).send({
+          error: 'Validation failed',
+          details: validation.error.issues
+        });
+      }
+
+      const updates = validation.data;
       const userId = request.user!.userId;
 
       // Check for username conflicts
