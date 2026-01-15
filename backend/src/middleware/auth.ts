@@ -16,7 +16,7 @@ export const authenticate = async (request: FastifyRequest, reply: FastifyReply)
       return reply.code(401).send({ error: 'Access token required' });
     }
 
-    const token = authHeader.substring(7); // Remove 'Bearer ' prefix
+    const token = authHeader.substring(7);
     const payload = verifyAccessToken(token);
 
     if (!payload) {
@@ -24,7 +24,7 @@ export const authenticate = async (request: FastifyRequest, reply: FastifyReply)
     }
 
     request.user = payload;
-  } catch (error) {
+  } catch {
     return reply.code(401).send({ error: 'Authentication failed' });
   }
 };
@@ -41,7 +41,7 @@ export const optionalAuthenticate = async (request: FastifyRequest) => {
         request.user = payload;
       }
     }
-  } catch (error) {
+  } catch {
     // Silently fail for optional auth
   }
 };

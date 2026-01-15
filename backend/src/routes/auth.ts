@@ -1,5 +1,4 @@
 import { FastifyInstance } from 'fastify';
-import { z } from 'zod';
 import { PrismaClient } from '@prisma/client';
 import {
   hashPassword,
@@ -13,20 +12,21 @@ import {
   loginSchema,
   refreshTokenSchema,
   updateProfileSchema,
-  RegisterInput,
-  LoginInput,
-  RefreshTokenInput,
-  UpdateProfileInput,
 } from '../utils/validation.js';
 import { authenticate } from '../middleware/auth.js';
 
 const prisma = new PrismaClient();
 
 export async function authRoutes(fastify: FastifyInstance) {
-  // User registration
   fastify.post('/register', async (request, reply) => {
     try {
-      const body = request.body as any;
+      const body = request.body as {
+        email: string;
+        password: string;
+        username?: string;
+        firstName?: string;
+        lastName?: string;
+      };
       const validation = registerSchema.safeParse(body);
 
       if (!validation.success) {
@@ -38,7 +38,6 @@ export async function authRoutes(fastify: FastifyInstance) {
 
       const { email, password, username, firstName, lastName } = validation.data;
 
-      // Check if user already exists
       const existingUser = await prisma.user.findFirst({
         where: {
           OR: [
@@ -54,10 +53,8 @@ export async function authRoutes(fastify: FastifyInstance) {
         });
       }
 
-      // Hash password
       const hashedPassword = await hashPassword(password);
 
-      // Create user
       const user = await prisma.user.create({
         data: {
           email,
@@ -77,19 +74,17 @@ export async function authRoutes(fastify: FastifyInstance) {
         },
       });
 
-      // Generate tokens
       const tokens = generateTokenPair({
         userId: user.id,
         email: user.email,
         role: user.role,
       });
 
-      // Create session
       await prisma.session.create({
         data: {
           userId: user.id,
           refreshToken: tokens.refreshToken,
-          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
         },
       });
 
@@ -104,10 +99,12 @@ export async function authRoutes(fastify: FastifyInstance) {
     }
   });
 
-  // User login
   fastify.post('/login', async (request, reply) => {
     try {
-      const body = request.body as any;
+      const body = request.body as {
+        email: string;
+        password: string;
+      };
       const validation = loginSchema.safeParse(body);
 
       if (!validation.success) {
@@ -117,9 +114,8 @@ export async function authRoutes(fastify: FastifyInstance) {
         });
       }
 
-      const { email, password } = validation.data;
+      const { email, password: loginPassword } = validation.data;
 
-      // Find user
       const user = await prisma.user.findUnique({
         where: { email },
         select: {
@@ -138,20 +134,17 @@ export async function authRoutes(fastify: FastifyInstance) {
         return reply.code(401).send({ error: 'Invalid credentials' });
       }
 
-      // Verify password
-      const isValidPassword = await verifyPassword(password, user.password);
+      const isValidPassword = await verifyPassword(loginPassword, user.password);
       if (!isValidPassword) {
         return reply.code(401).send({ error: 'Invalid credentials' });
       }
 
-      // Generate tokens
       const tokens = generateTokenPair({
         userId: user.id,
         email: user.email,
         role: user.role,
       });
 
-      // Create session (invalidate old refresh tokens for this user)
       await prisma.session.deleteMany({
         where: { userId: user.id },
       });
@@ -160,14 +153,12 @@ export async function authRoutes(fastify: FastifyInstance) {
         data: {
           userId: user.id,
           refreshToken: tokens.refreshToken,
-          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+          expiresAt: new Date(Date.now() +7 * 24 * 60 * 60 * 1000),
         },
       });
 
-      const { password: _, ...userWithoutPassword } = user;
-
       reply.send({
-        user: userWithoutPassword,
+        user,
         accessToken: tokens.accessToken,
         refreshToken: tokens.refreshToken,
       });
@@ -177,10 +168,11 @@ export async function authRoutes(fastify: FastifyInstance) {
     }
   });
 
-  // Refresh access token
   fastify.post('/refresh', async (request, reply) => {
     try {
-      const body = request.body as any;
+      const body = request.body as {
+        refreshToken: string;
+      };
       const validation = refreshTokenSchema.safeParse(body);
 
       if (!validation.success) {
@@ -192,13 +184,11 @@ export async function authRoutes(fastify: FastifyInstance) {
 
       const { refreshToken } = validation.data;
 
-      // Verify refresh token
       const payload = verifyRefreshToken(refreshToken);
       if (!payload) {
         return reply.code(401).send({ error: 'Invalid refresh token' });
       }
 
-      // Check if session exists and is valid
       const session = await prisma.session.findUnique({
         where: { refreshToken },
         include: { user: true },
@@ -208,7 +198,6 @@ export async function authRoutes(fastify: FastifyInstance) {
         return reply.code(401).send({ error: 'Refresh token expired' });
       }
 
-      // Generate new access token
       const accessToken = generateTokenPair({
         userId: session.user.id,
         email: session.user.email,
@@ -222,7 +211,6 @@ export async function authRoutes(fastify: FastifyInstance) {
     }
   });
 
-  // Logout
   fastify.post('/logout', async (request, reply) => {
     try {
       const authHeader = request.headers.authorization;
@@ -232,7 +220,6 @@ export async function authRoutes(fastify: FastifyInstance) {
         const payload = verifyAccessToken(token);
 
         if (payload) {
-          // Delete all sessions for this user
           await prisma.session.deleteMany({
             where: { userId: payload.userId },
           });
@@ -246,7 +233,6 @@ export async function authRoutes(fastify: FastifyInstance) {
     }
   });
 
-  // Get current user profile
   fastify.get('/me', {
     preHandler: authenticate,
   }, async (request, reply) => {
@@ -279,12 +265,16 @@ export async function authRoutes(fastify: FastifyInstance) {
     }
   });
 
-  // Update user profile
   fastify.put('/me', {
     preHandler: authenticate,
   }, async (request, reply) => {
     try {
-      const body = request.body as any;
+      const body = request.body as {
+        username?: string;
+        firstName?: string;
+        lastName?: string;
+        avatar?: string;
+      };
       const validation = updateProfileSchema.safeParse(body);
 
       if (!validation.success) {
@@ -297,7 +287,6 @@ export async function authRoutes(fastify: FastifyInstance) {
       const updates = validation.data;
       const userId = request.user!.userId;
 
-      // Check for username conflicts
       if (updates.username) {
         const existingUser = await prisma.user.findFirst({
           where: {

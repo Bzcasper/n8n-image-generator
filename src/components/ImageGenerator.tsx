@@ -1,9 +1,11 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import Header from './Header';
 import GenerationForm from './GenerationForm';
 import ImageDisplay from './ImageDisplay';
 import ImageGallery from './ImageGallery';
 import { GenerationParams, GeneratedImage } from '../types';
+import { sessionImageCache } from '../lib/imageCache';
+import { authClient } from '../lib/auth';
 
 interface ImageGeneratorProps {
   onBackToLanding: () => void;
@@ -14,19 +16,53 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({ onBackToLanding }) => {
   const [imageHistory, setImageHistory] = useState<GeneratedImage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  const session = authClient.useSession();
+
+  const fetchUserImages = useCallback(async () => {
+    if (!session.data?.session?.token) return;
+
+    try {
+      const response = await fetch('/api/users/images', {
+        headers: {
+          'Authorization': `Bearer ${session.data.session.token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setImageHistory(data.images || []);
+      }
+    } catch (err) {
+      console.error('Failed to fetch user images:', err);
+    }
+  }, [session.data?.session?.token]);
+
+  useEffect(() => {
+    if (session.isPending) return;
+    const authenticated = !session.isPending && !!session.data?.user;
+    setIsAuthenticated(authenticated);
+
+    if (authenticated) {
+      fetchUserImages();
+    } else {
+      const cachedImages = sessionImageCache.getImages();
+      setImageHistory(cachedImages);
+    }
+  }, [session, fetchUserImages]);
 
   const generateImage = useCallback(async (params: GenerationParams) => {
     setIsLoading(true);
     setError(null);
 
     try {
-      // Webhook URL from environment variable
       const webhookUrl = import.meta.env.VITE_N8N_WEBHOOK_URL;
 
       if (!webhookUrl) {
         throw new Error('Webhook URL not configured. Please set VITE_N8N_WEBHOOK_URL in your .env file.');
       }
-      
+
       const queryParams = new URLSearchParams({
         message: params.message,
         style: params.style,
@@ -67,12 +103,36 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({ onBackToLanding }) => {
 
       setCurrentImage(generatedImage);
       setImageHistory(prev => [generatedImage, ...prev]);
+
+      sessionImageCache.addImage(generatedImage);
+
+      await fetch('/api/increment-generation', {
+        method: 'POST',
+      }).catch(err => console.error('Failed to increment rate limit:', err));
+
+      if (isAuthenticated && session.data?.session?.token) {
+        await fetch('/api/users/images', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.data.session.token}`,
+          },
+          body: JSON.stringify({
+            prompt: params.message,
+            imageUrl: generatedImage.url,
+            style: params.style,
+            size: params.size,
+            quality: params.quality,
+            seed: params.seed,
+          }),
+        }).catch(err => console.error('Failed to save image:', err));
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unexpected error occurred');
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [isAuthenticated, session.data?.session?.token]);
 
   const handleImageSelect = useCallback((image: GeneratedImage) => {
     setCurrentImage(image);

@@ -2,9 +2,9 @@ import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import helmet from '@fastify/helmet';
 import rateLimit from '@fastify/rate-limit';
-import { PrismaClient } from '@prisma/client';
 import { authRoutes } from './routes/auth.js';
 import { userRoutes } from './routes/users.js';
+import { rateLimitRoutes } from './routes/rateLimit.js';
 
 const fastify = Fastify({
   logger: true,
@@ -36,13 +36,14 @@ await fastify.register(rateLimit, {
 });
 
 // Global hooks
-fastify.addHook('preHandler', async (request, reply) => {
+fastify.addHook('preHandler', async () => {
   // Add any global pre-handler logic here
 });
 
 // Register routes
 fastify.register(authRoutes, { prefix: '/api/auth' });
 fastify.register(userRoutes, { prefix: '/api/users' });
+fastify.register(rateLimitRoutes, { prefix: '/api' });
 
 // Health check
 fastify.get('/health', async () => {

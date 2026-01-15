@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Download, Maximize, Clock, Settings, Palette, Monitor, Share2, Heart } from 'lucide-react';
+import { Download, Maximize, Palette, Heart } from 'lucide-react';
 import { GeneratedImage } from '../types';
 
 interface ImageDisplayProps {
@@ -24,10 +24,6 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({ image, isLoading, error, on
 
   const handleCloseFullscreen = () => {
     setIsFullscreen(false);
-  };
-
-  const formatTimestamp = (timestamp: string) => {
-    return new Date(timestamp).toLocaleString();
   };
 
   if (isLoading) {
