@@ -1,8 +1,38 @@
-import { AuthView } from '@neondatabase/neon-js/auth/react/ui';
-import { useParams } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import LoginForm from '../components/LoginForm';
+import RegisterForm from '../components/RegisterForm';
+import { useAuth } from '../lib/backendAuth';
 
 export function Auth() {
-  const { pathname } = useParams();
+  const [isLoginMode, setIsLoginMode] = useState(true);
+  const { isAuthenticated, isLoading } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    // Check URL path to determine mode
+    const path = location.pathname;
+    if (path === '/auth/register') {
+      setIsLoginMode(false);
+    } else if (path === '/auth/login') {
+      setIsLoginMode(true);
+    }
+
+    // Redirect if already authenticated
+    if (isAuthenticated && !isLoading) {
+      navigate('/');
+    }
+  }, [location.pathname, isAuthenticated, isLoading, navigate]);
+
+  const handleToggleMode = () => {
+    setIsLoginMode((prev) => !prev);
+  };
+
+  const handleSuccess = () => {
+    navigate('/');
+  };
+
   return (
     <div
       style={{
@@ -22,7 +52,7 @@ export function Auth() {
           cursor: 'pointer',
           transition: 'transform 0.3s',
         }}
-        onClick={() => window.location.href = '/'}
+        onClick={() => navigate('/')}
         onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
         onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
       >
@@ -50,7 +80,24 @@ export function Auth() {
           width: '100%',
         }}
       >
-        <AuthView pathname={pathname} />
+        <h2
+          style={{
+            fontSize: '2rem',
+            fontWeight: '800',
+            marginBottom: '1.5rem',
+            textAlign: 'center',
+            fontFamily: 'Sniglet, cursive',
+            color: '#006D88',
+          }}
+        >
+          {isLoginMode ? 'Welcome Back!' : 'Create Account'}
+        </h2>
+
+        {isLoginMode ? (
+          <LoginForm onToggleMode={handleToggleMode} onSuccess={handleSuccess} />
+        ) : (
+          <RegisterForm onToggleMode={handleToggleMode} onSuccess={handleSuccess} />
+        )}
       </div>
     </div>
   );

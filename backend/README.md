@@ -109,14 +109,143 @@ curl -X GET http://localhost:3001/api/auth/me \
 
 ## Environment Variables
 
+### Setup Instructions
+
+1. **Copy the example file:**
+   ```bash
+   cp .env.example .env
+   ```
+
+2. **Fill in your credentials in `.env`:**
+
+### Required Variables
+
+#### Database Configuration
+
 ```env
-DATABASE_URL="postgresql://username:password@localhost:5432/splashtool_db"
-JWT_SECRET="your-jwt-secret-key"
-JWT_REFRESH_SECRET="your-jwt-refresh-secret-key"
-PORT=3001
-NODE_ENV="development"
-FRONTEND_URL="http://localhost:5173"
+# Database - Neon PostgreSQL
+# Get your connection string from: https://console.neon.tech
+DATABASE_URL="postgresql://username:password@hostname:5432/database_name?sslmode=require&channel_binding=require"
+
+# Get your API key from: https://console.neon.tech
+NEON_API_KEY="your-neon-api-key"
 ```
+
+**Setting up Neon PostgreSQL:**
+1. Go to [Neon Console](https://console.neon.tech)
+2. Create a new project or select existing one
+3. Copy the connection string to `DATABASE_URL`
+4. Go to API Keys section and generate a new key for `NEON_API_KEY`
+
+#### JWT Secrets
+
+```env
+# JWT Secrets (generate random strings for production)
+# Use: openssl rand -base64 32 to generate secure secrets
+JWT_SECRET="your-jwt-secret-key-minimum-32-characters-long"
+JWT_REFRESH_SECRET="your-jwt-refresh-secret-key-different-from-jwt-secret"
+```
+
+**Generating secure secrets:**
+```bash
+# Generate JWT_SECRET
+openssl rand -base64 32
+
+# Generate JWT_REFRESH_SECRET
+openssl rand -base64 32
+```
+
+**Security Note:** Never use the example values in production. Always generate unique, random secrets.
+
+#### Server Configuration
+
+```env
+PORT=3001
+NODE_ENV="development"  # Set to "production" for production
+HOST="0.0.0.0"
+FRONTEND_URL="http://localhost:5173"  # Update with your production frontend URL
+```
+
+### Optional Variables
+
+#### Object Storage (Cloudflare R2)
+
+```env
+# Get credentials from: https://dash.cloudflare.com -> R2 -> Create Bucket
+R2_BUCKET_NAME="your-bucket-name"
+R2_ACCESS_KEY_ID="your-r2-access-key-id"
+R2_SECRET_ACCESS_KEY="your-r2-secret-access-key"
+R2_PUBLIC_URL="https://your-r2-bucket.r2.dev"
+R2_ACCOUNT_ID="your-cloudflare-account-id"
+R2_CUSTOM_DOMAIN="https://images.yourdomain.com"
+```
+
+**Setting up Cloudflare R2:**
+1. Go to [Cloudflare Dashboard](https://dash.cloudflare.com)
+2. Navigate to R2 > Create Bucket
+3. Create an API Token with R2 permissions
+4. Configure your bucket with a custom domain for public access
+
+#### Email Service (Optional)
+
+```env
+# For Gmail, use an App Password: https://support.google.com/accounts/answer/185833
+EMAIL_SERVICE="gmail"
+EMAIL_USER="noreply@yourdomain.com"
+EMAIL_PASS="your-app-password"
+EMAIL_FROM="YourApp <noreply@yourdomain.com>"
+```
+
+**Setting up Gmail for email:**
+1. Enable 2-Factor Authentication on your Google Account
+2. Go to [App Passwords](https://myaccount.google.com/apppasswords)
+3. Generate a new app password for "Mail"
+4. Use the generated password for `EMAIL_PASS`
+
+#### Security Settings
+
+```env
+BCRYPT_ROUNDS=12
+RATE_LIMIT_MAX=100
+RATE_LIMIT_TIME_WINDOW="1 minute"
+LOG_LEVEL="info"  # Options: "error", "warn", "info", "debug"
+```
+
+### Security Best Practices
+
+1. **NEVER commit `.env` files** - They are already in `.gitignore`
+2. **Use different secrets for each environment** (dev, staging, production)
+3. **Rotate secrets regularly** - Every 90 days for production
+4. **Use strong, random secrets** - Minimum 32 characters for JWT secrets
+5. **Set appropriate `NODE_ENV`** - Always use `production` in production
+6. **Limit database access** - Use read-only credentials where possible
+7. **Use environment-specific values** - Different `FRONTEND_URL` for each environment
+
+### Regenerating Compromised Credentials
+
+If you suspect your credentials have been compromised (e.g., committed to version control), immediately:
+
+1. **Neon Database:**
+   - Go to Neon Console > Your Project > Connection Details
+   - Reset the database password
+   - Update `DATABASE_URL` with new credentials
+
+2. **Neon API Key:**
+   - Go to Neon Console > API Keys
+   - Delete the compromised key
+   - Generate a new key
+   - Update `NEON_API_KEY`
+
+3. **JWT Secrets:**
+   - Generate new secrets using `openssl rand -base64 32`
+   - Update `JWT_SECRET` and `JWT_REFRESH_SECRET`
+   - **Important:** All existing sessions will be invalidated, users will need to re-login
+
+4. **R2 Credentials:**
+   - Go to Cloudflare Dashboard > R2 > Manage R2 API Tokens
+   - Revoke old tokens
+   - Create new tokens
+   - Update R2 environment variables
 
 ## Scripts
 

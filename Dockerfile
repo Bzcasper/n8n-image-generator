@@ -12,8 +12,12 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-# Copy environment file
-COPY .env .env
+# SECURITY: Environment variables should be passed at runtime using:
+# - Docker: docker run -e VAR_NAME=value
+# - Docker Compose: environment: section in docker-compose.yml
+# - For production, consider Docker secrets or a secrets management service
+# (e.g., AWS Secrets Manager, HashiCorp Vault)
+# NEVER include .env files in Docker images as they bake secrets into the image
 
 # Build the app
 RUN npm run build

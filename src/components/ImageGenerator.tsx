@@ -5,7 +5,7 @@ import ImageDisplay from './ImageDisplay';
 import ImageGallery from './ImageGallery';
 import { GenerationParams, GeneratedImage } from '../types';
 import { sessionImageCache } from '../lib/imageCache';
-import { authClient } from '../lib/auth';
+import { useAuth, fetchWithAuth } from '../lib/backendAuth';
 
 interface ImageGeneratorProps {
   onBackToLanding: () => void;
@@ -16,19 +16,14 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({ onBackToLanding }) => {
   const [imageHistory, setImageHistory] = useState<GeneratedImage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const session = authClient.useSession();
+  const { isAuthenticated, accessToken, isLoading: authLoading } = useAuth();
 
   const fetchUserImages = useCallback(async () => {
-    if (!session.data?.session?.token) return;
+    if (!accessToken) return;
 
     try {
-      const response = await fetch('/api/users/images', {
-        headers: {
-          'Authorization': `Bearer ${session.data.session.token}`,
-        },
-      });
+      const response = await fetchWithAuth('/api/users/images');
 
       if (response.ok) {
         const data = await response.json();
@@ -37,20 +32,18 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({ onBackToLanding }) => {
     } catch (err) {
       console.error('Failed to fetch user images:', err);
     }
-  }, [session.data?.session?.token]);
+  }, [accessToken]);
 
   useEffect(() => {
-    if (session.isPending) return;
-    const authenticated = !session.isPending && !!session.data?.user;
-    setIsAuthenticated(authenticated);
+    if (authLoading) return;
 
-    if (authenticated) {
+    if (isAuthenticated) {
       fetchUserImages();
     } else {
       const cachedImages = sessionImageCache.getImages();
       setImageHistory(cachedImages);
     }
-  }, [session, fetchUserImages]);
+  }, [isAuthenticated, authLoading, fetchUserImages]);
 
   const generateImage = useCallback(async (params: GenerationParams) => {
     setIsLoading(true);
@@ -102,21 +95,17 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({ onBackToLanding }) => {
       };
 
       setCurrentImage(generatedImage);
-      setImageHistory(prev => [generatedImage, ...prev]);
+      setImageHistory((prev) => [generatedImage, ...prev]);
 
       sessionImageCache.addImage(generatedImage);
 
       await fetch('/api/increment-generation', {
         method: 'POST',
-      }).catch(err => console.error('Failed to increment rate limit:', err));
+      }).catch((err) => console.error('Failed to increment rate limit:', err));
 
-      if (isAuthenticated && session.data?.session?.token) {
-        await fetch('/api/users/images', {
+      if (isAuthenticated && accessToken) {
+        await fetchWithAuth('/api/users/images', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${session.data.session.token}`,
-          },
           body: JSON.stringify({
             prompt: params.message,
             imageUrl: generatedImage.url,
@@ -125,14 +114,14 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({ onBackToLanding }) => {
             quality: params.quality,
             seed: params.seed,
           }),
-        }).catch(err => console.error('Failed to save image:', err));
+        }).catch((err) => console.error('Failed to save image:', err));
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unexpected error occurred');
     } finally {
       setIsLoading(false);
     }
-  }, [isAuthenticated, session.data?.session?.token]);
+  }, [isAuthenticated, accessToken]);
 
   const handleImageSelect = useCallback((image: GeneratedImage) => {
     setCurrentImage(image);
@@ -163,7 +152,7 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({ onBackToLanding }) => {
 
       <div className="relative z-10 flex flex-col h-full">
         <Header onBackToLanding={onBackToLanding} />
-        
+
         <main className="flex-grow flex flex-col overflow-hidden px-6 py-4">
           <div className="flex-grow grid grid-cols-1 lg:grid-cols-12 gap-6 overflow-hidden max-w-[1600px] mx-auto w-full">
             {/* Left Column: Form */}
@@ -174,7 +163,7 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({ onBackToLanding }) => {
                 error={error}
               />
             </div>
-            
+
             {/* Right Column: Main Image Display */}
             <div className="lg:col-span-7 h-full flex flex-col overflow-hidden">
               <ImageDisplay
