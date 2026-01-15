@@ -98,3 +98,36 @@ body {
 .animate-pulse-glow {
   animation: pulse-glow 3s ease-in-out infinite;
 }
+
+/* Navigation button border drawing animation */
+@keyframes borderDraw {
+  0% {
+    width: 0%;
+    height: 0%;
+    opacity: 0;
+  }
+  25% {
+    width: 100%;
+    height: 0%;
+    opacity: 1;
+  }
+  50% {
+    width: 100%;
+    height: 100%;
+    opacity: 1;
+  }
+  75% {
+    width: 0%;
+    height: 100%;
+    opacity: 1;
+  }
+  100% {
+    width: 0%;
+    height: 0%;
+    opacity: 1;
+  }
+}
+
+.animate-border-draw {
+  animation: borderDraw 0.8s ease-in-out;
+}

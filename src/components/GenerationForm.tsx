@@ -69,224 +69,187 @@ const GenerationForm: React.FC<GenerationFormProps> = ({ onGenerate, isLoading, 
   const isFormValid = message.trim().length >= 3 && message.trim().length <= 500;
 
   return (
-    <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-white/20 relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-violet-50/50 via-purple-50/30 to-blue-50/50 pointer-events-none"></div>
-      <div className="relative z-10">
-        <div className="flex items-center space-x-3 mb-8">
-          <div className="p-2 bg-gradient-to-r from-violet-500 to-purple-500 rounded-xl">
-            <Wand2 className="w-6 h-6 text-white" />
-          </div>
-          <div>
-            <h3 className="text-2xl font-bold text-gray-900">Create Magic</h3>
-            <p className="text-sm text-gray-500">Describe your vision</p>
+    <div className="bg-white/90 backdrop-blur-md rounded-20 shadow-xl p-6 border border-navy/10 h-full flex flex-col">
+      <div className="flex items-center space-x-3 mb-6">
+        <div className="p-2 bg-navy/5 rounded-lg">
+          <Wand2 className="w-5 h-5 text-navy" />
+        </div>
+        <div>
+          <h3 className="text-xl font-black font-sniglet text-black uppercase tracking-tight">Create Magic</h3>
+          <p className="text-[10px] text-navy/40 font-black font-varela uppercase tracking-widest">Describe your vision</p>
+        </div>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-5 flex-grow flex flex-col overflow-hidden">
+        <div className="space-y-2">
+          <label htmlFor="message" className="block text-[11px] font-black font-varela text-navy uppercase tracking-widest">
+            Prompt
+          </label>
+          <div className="relative">
+            <textarea
+              id="message"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              placeholder="A majestic dragon..."
+              className="w-full px-4 py-3 border-2 border-navy/5 rounded-xl focus:ring-2 focus:ring-blue focus:border-blue resize-none transition-all duration-300 text-sm font-bold font-varela text-slate-700 placeholder-slate-400 bg-white shadow-inner"
+              rows={3}
+              maxLength={500}
+              required
+            />
+            <div className="absolute bottom-2 right-3 flex items-center space-x-1">
+              <Sparkles className="w-3 h-3 text-blue/40" />
+              <span className="text-[10px] text-navy/30 font-black">{message.length}/500</span>
+            </div>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-8">
-          <div className="space-y-3">
-            <label htmlFor="message" className="block text-sm font-semibold text-gray-700">
-              Your Creative Vision
-            </label>
-            <div className="relative">
-              <textarea
-                id="message"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                placeholder="A majestic dragon soaring through a starlit sky with aurora borealis dancing in the background..."
-                className="w-full px-5 py-4 border-2 border-gray-200 rounded-2xl focus:ring-2 focus:ring-violet-500 focus:border-violet-500 resize-none transition-all duration-300 text-gray-700 placeholder-gray-400 bg-white/70 backdrop-blur-sm"
-                rows={4}
-                maxLength={500}
-                required
-              />
-              <div className="absolute bottom-3 right-3 flex items-center space-x-2">
-                <Sparkles className="w-4 h-4 text-violet-400" />
-                <span className="text-xs text-gray-400 font-medium">{message.length}/500</span>
-              </div>
-            </div>
-            <div className="flex justify-between text-xs text-gray-500">
-              <span className="flex items-center space-x-1">
-                <span className="w-2 h-2 bg-green-400 rounded-full"></span>
-                <span>Minimum 3 characters</span>
-              </span>
-            </div>
+        <div className="space-y-3">
+          <label className="block text-[11px] font-black font-varela text-navy uppercase tracking-widest">Art Style</label>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 overflow-y-auto max-h-[120px] pr-1 custom-scrollbar">
+            {STYLE_OPTIONS.map((option) => (
+              <label key={option.value} className={`group flex flex-col items-center justify-center p-2 border-2 rounded-xl cursor-pointer transition-all duration-200 ${
+                style === option.value 
+                  ? 'border-blue bg-blue/5 shadow-md scale-105' 
+                  : 'border-navy/5 hover:border-blue/30 bg-white'
+              }`}>
+                <input
+                  type="radio"
+                  name="style"
+                  value={option.value}
+                  checked={style === option.value}
+                  onChange={(e) => setStyle(e.target.value)}
+                  className="sr-only"
+                />
+                <span className={`text-[10px] font-black font-sniglet text-center ${style === option.value ? 'text-blue' : 'text-slate-600'}`}>
+                  {option.label}
+                </span>
+              </label>
+            ))}
           </div>
+        </div>
 
-          <div className="space-y-4">
-            <label className="block text-sm font-semibold text-gray-700">Art Style</label>
-            <div className="grid grid-cols-1 gap-3">
-              {STYLE_OPTIONS.map((option) => (
-                <label key={option.value} className={`group flex items-center space-x-4 p-4 border-2 rounded-2xl cursor-pointer transition-all duration-300 hover:shadow-md ${
-                  style === option.value 
-                    ? 'border-violet-500 bg-gradient-to-r from-violet-50 to-purple-50 shadow-lg' 
-                    : 'border-gray-200 hover:border-violet-300 bg-white/50'
-                }`}>
-                  <input
-                    type="radio"
-                    name="style"
-                    value={option.value}
-                    checked={style === option.value}
-                    onChange={(e) => setStyle(e.target.value)}
-                    className="w-5 h-5 text-violet-600 focus:ring-violet-500 focus:ring-2"
-                  />
-                  <div className="flex-1">
-                    <div className="text-sm font-semibold text-gray-900">{option.label}</div>
-                    <div className="text-xs text-gray-500 mt-0.5">{option.description}</div>
-                  </div>
-                  {style === option.value && (
-                    <div className="w-2 h-2 bg-violet-500 rounded-full animate-pulse"></div>
-                  )}
-                </label>
-              ))}
+        <div className="space-y-3">
+          <label className="block text-[11px] font-black font-varela text-navy uppercase tracking-widest">Dimensions</label>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            {SIZE_OPTIONS.map((option) => (
+              <label key={option.value} className={`group flex flex-col items-center justify-center p-2 border-2 rounded-xl cursor-pointer transition-all duration-200 ${
+                size === option.value 
+                  ? 'border-mint bg-mint/5 shadow-md scale-105' 
+                  : 'border-navy/5 hover:border-mint/30 bg-white'
+              }`}>
+                <input
+                  type="radio"
+                  name="size"
+                  value={option.value}
+                  checked={size === option.value}
+                  onChange={(e) => setSize(e.target.value)}
+                  className="sr-only"
+                />
+                <span className={`text-[10px] font-black font-sniglet text-center ${size === option.value ? 'text-mint' : 'text-slate-600'}`}>
+                  {option.label}
+                </span>
+                <span className="text-[8px] font-bold font-varela text-slate-400">{option.description}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        <div className="pt-1">
+          <button
+            type="button"
+            onClick={() => setShowAdvanced(!showAdvanced)}
+            className="flex items-center space-x-2 text-[10px] font-black font-varela text-navy/40 hover:text-navy transition-colors uppercase tracking-widest group"
+          >
+            <Settings className="w-3 h-3 group-hover:rotate-90 transition-transform duration-300" />
+            <span>Advanced Settings</span>
+            <ChevronDown className={`w-3 h-3 transition-transform duration-300 ${showAdvanced ? 'rotate-180' : ''}`} />
+          </button>
+        </div>
+
+        {showAdvanced && (
+          <div className="space-y-4 pt-4 border-t border-navy/5 animate-in slide-in-from-top duration-300 flex-shrink-0 overflow-y-auto max-h-[150px] pr-1 custom-scrollbar">
+            <div className="grid grid-cols-2 gap-4">
+               <div className="space-y-1">
+                 <label className="block text-[9px] font-black font-varela text-navy/40 uppercase tracking-widest">Quality Level</label>
+                 <select 
+                    value={quality}
+                    onChange={(e) => setQuality(e.target.value)}
+                    className="w-full text-[10px] font-bold font-varela bg-white border-2 border-navy/5 rounded-lg px-2 py-1 outline-none focus:border-blue"
+                 >
+                   {QUALITY_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                 </select>
+               </div>
+               <div className="space-y-1">
+                 <label className="block text-[9px] font-black font-varela text-navy/40 uppercase tracking-widest">AI Model</label>
+                 <select 
+                    value={model}
+                    onChange={(e) => setModel(e.target.value)}
+                    className="w-full text-[10px] font-bold font-varela bg-white border-2 border-navy/5 rounded-lg px-2 py-1 outline-none focus:border-blue"
+                 >
+                   {MODEL_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                 </select>
+               </div>
             </div>
-          </div>
-
-          <div className="space-y-4">
-            <label className="block text-sm font-semibold text-gray-700">Dimensions</label>
-            <div className="grid grid-cols-2 gap-3">
-              {SIZE_OPTIONS.map((option) => (
-                <label key={option.value} className={`group flex items-center space-x-3 p-4 border-2 rounded-2xl cursor-pointer transition-all duration-300 hover:shadow-md ${
-                  size === option.value 
-                    ? 'border-violet-500 bg-gradient-to-r from-violet-50 to-purple-50 shadow-lg' 
-                    : 'border-gray-200 hover:border-violet-300 bg-white/50'
-                }`}>
-                  <input
-                    type="radio"
-                    name="size"
-                    value={option.value}
-                    checked={size === option.value}
-                    onChange={(e) => setSize(e.target.value)}
-                    className="w-4 h-4 text-violet-600 focus:ring-violet-500"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm font-semibold text-gray-900">{option.label}</div>
-                    <div className="text-xs text-gray-500">{option.description}</div>
-                  </div>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <button
-              type="button"
-              onClick={() => setShowAdvanced(!showAdvanced)}
-              className="flex items-center space-x-2 text-sm text-gray-600 hover:text-violet-600 transition-colors font-medium group"
-            >
-              <Settings className="w-4 h-4 group-hover:rotate-90 transition-transform duration-300" />
-              <span>Advanced Settings</span>
-              <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${showAdvanced ? 'rotate-180' : ''}`} />
-            </button>
-          </div>
-
-          {showAdvanced && (
-            <div className="space-y-6 pt-6 border-t border-gray-200 animate-in slide-in-from-top duration-300">
-              <div className="space-y-4">
-                <label className="block text-sm font-semibold text-gray-700">Quality Level</label>
-                <div className="space-y-3">
-                  {QUALITY_OPTIONS.map((option) => (
-                    <label key={option.value} className={`group flex items-center space-x-4 p-4 border-2 rounded-2xl cursor-pointer transition-all duration-300 hover:shadow-md ${
-                      quality === option.value 
-                        ? 'border-violet-500 bg-gradient-to-r from-violet-50 to-purple-50 shadow-lg' 
-                        : 'border-gray-200 hover:border-violet-300 bg-white/50'
-                    }`}>
-                      <input
-                        type="radio"
-                        name="quality"
-                        value={option.value}
-                        checked={quality === option.value}
-                        onChange={(e) => setQuality(e.target.value)}
-                        className="w-5 h-5 text-violet-600 focus:ring-violet-500"
-                      />
-                      <div className="flex-1">
-                        <div className="text-sm font-semibold text-gray-900">{option.label}</div>
-                        <div className="text-xs text-gray-500 mt-0.5">{option.description}</div>
-                      </div>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <label className="block text-sm font-semibold text-gray-700">AI Model</label>
-                <div className="space-y-3">
-                  {MODEL_OPTIONS.map((option) => (
-                    <label key={option.value} className={`group flex items-center space-x-4 p-4 border-2 rounded-2xl cursor-pointer transition-all duration-300 hover:shadow-md ${
-                      model === option.value 
-                        ? 'border-violet-500 bg-gradient-to-r from-violet-50 to-purple-50 shadow-lg' 
-                        : 'border-gray-200 hover:border-violet-300 bg-white/50'
-                    }`}>
-                      <input
-                        type="radio"
-                        name="model"
-                        value={option.value}
-                        checked={model === option.value}
-                        onChange={(e) => setModel(e.target.value)}
-                        className="w-5 h-5 text-violet-600 focus:ring-violet-500"
-                      />
-                      <div className="flex-1">
-                        <div className="text-sm font-semibold text-gray-900">{option.label}</div>
-                        <div className="text-xs text-gray-500 mt-0.5">{option.description}</div>
-                      </div>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <label htmlFor="seed" className="block text-sm font-semibold text-gray-700">
-                  Seed Value
-                </label>
-                <div className="flex space-x-3">
-                  <input
+            <div className="space-y-1">
+               <label htmlFor="seed" className="block text-[9px] font-black font-varela text-navy/40 uppercase tracking-widest">Seed Value</label>
+               <div className="flex space-x-2">
+                 <input
                     type="number"
                     id="seed"
                     value={seed}
                     onChange={(e) => setSeed(parseInt(e.target.value) || 0)}
-                    className="flex-1 px-4 py-3 border-2 border-gray-200 rounded-2xl focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition-all duration-300 bg-white/70"
-                    min={0}
-                    max={999999}
-                  />
-                  <button
+                    className="flex-1 px-3 py-1.5 border-2 border-navy/5 rounded-lg text-xs font-bold font-varela outline-none focus:border-blue"
+                 />
+                 <button
                     type="button"
                     onClick={generateRandomSeed}
-                    className="px-4 py-3 bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 rounded-2xl hover:from-violet-100 hover:to-purple-100 hover:text-violet-700 transition-all duration-300 group"
+                    className="p-1.5 bg-navy/5 text-navy rounded-lg hover:bg-navy/10 transition-colors"
                   >
-                    <Shuffle className="w-5 h-5 group-hover:rotate-180 transition-transform duration-300" />
+                    <Shuffle className="w-4 h-4" />
                   </button>
-                </div>
-                <p className="text-xs text-gray-500">Use the same seed to reproduce results</p>
-              </div>
+               </div>
             </div>
-          )}
+          </div>
+        )}
 
+        <div className="pt-2 mt-auto">
           {error && (
-            <div className="p-4 bg-gradient-to-r from-red-50 to-pink-50 border-2 border-red-200 rounded-2xl animate-in slide-in-from-top duration-300">
-              <p className="text-sm text-red-700 font-medium">{error}</p>
+            <div className="p-3 mb-4 bg-red-50 border-2 border-red-100 rounded-xl">
+              <p className="text-[10px] text-red-600 font-bold font-varela leading-tight">{error}</p>
             </div>
           )}
 
-          <button
-            type="submit"
-            disabled={!isFormValid || isLoading}
-            className="w-full bg-gradient-to-r from-violet-600 via-purple-600 to-blue-600 text-white py-4 px-8 rounded-2xl font-bold text-lg disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-2xl hover:scale-105 transition-all duration-300 relative overflow-hidden group"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-violet-400 via-purple-400 to-blue-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            <div className="relative z-10">
+          <div className="relative group">
+            <div 
+              className="absolute inset-0 blur-xl opacity-30 group-hover:opacity-60 transition-opacity duration-500 animate-pulse-glow"
+              style={{
+                background: 'radial-gradient(circle, #48E5B6 0%, #00B4FF 50%, #006D88 100%)',
+              }}
+            />
+            
+            <button
+              type="submit"
+              disabled={!isFormValid || isLoading}
+              className="relative w-full text-white py-3 px-6 rounded-xl font-black font-sniglet text-sm uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed hover:-translate-y-1 transition-all duration-300 shadow-lg"
+              style={{
+                background: 'linear-gradient(135deg, #48E5B6 0%, #00B4FF 50%, #006D88 100%)',
+              }}
+            >
               {isLoading ? (
-                <div className="flex items-center justify-center space-x-3">
-                  <div className="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
-                  <span>Creating Magic...</span>
+                <div className="flex items-center justify-center space-x-2">
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <span>Generating...</span>
                 </div>
               ) : (
                 <div className="flex items-center justify-center space-x-2">
-                  <Sparkles className="w-5 h-5" />
-                  <span>Generate Masterpiece</span>
+                  <Sparkles className="w-4 h-4" />
+                  <span>Splash It!</span>
                 </div>
               )}
-            </div>
-          </button>
-        </form>
-      </div>
+            </button>
+          </div>
+        </div>
+      </form>
     </div>
   );
 };

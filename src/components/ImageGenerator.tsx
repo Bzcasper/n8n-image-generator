@@ -1,12 +1,15 @@
 import React, { useState, useCallback } from 'react';
 import Header from './Header';
-import Footer from './Footer';
 import GenerationForm from './GenerationForm';
 import ImageDisplay from './ImageDisplay';
 import ImageGallery from './ImageGallery';
 import { GenerationParams, GeneratedImage } from '../types';
 
-const ImageGenerator = () => {
+interface ImageGeneratorProps {
+  onBackToLanding: () => void;
+}
+
+const ImageGenerator: React.FC<ImageGeneratorProps> = ({ onBackToLanding }) => {
   const [currentImage, setCurrentImage] = useState<GeneratedImage | null>(null);
   const [imageHistory, setImageHistory] = useState<GeneratedImage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -93,44 +96,18 @@ const ImageGenerator = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-violet-50 via-purple-50 to-blue-50 relative overflow-hidden">
-      {/* Background decorative elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-r from-violet-400/20 to-purple-400/20 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-full blur-3xl"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-pink-400/10 to-violet-400/10 rounded-full blur-3xl"></div>
-      </div>
+    <div className="h-screen bg-[#F0F2F5] relative overflow-hidden flex flex-col">
+      {/* Dynamic Background Blobs */}
+      <div className="absolute top-[-10%] left-[-10%] w-[40vw] h-[40vw] rounded-full blur-[120px] opacity-20 bg-mint pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40vw] h-[40vw] rounded-full blur-[120px] opacity-20 bg-blue pointer-events-none" />
 
-      <div className="relative z-10">
-        <Header />
+      <div className="relative z-10 flex flex-col h-full">
+        <Header onBackToLanding={onBackToLanding} />
         
-        <main className="container mx-auto px-6 py-12">
-          <div className="text-center mb-16">
-            <h2 className="text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
-              Create
-              <span className="bg-gradient-to-r from-violet-600 via-purple-600 to-blue-600 bg-clip-text text-transparent"> Amazing </span>
-              AI Images
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed font-medium">
-              Transform your wildest imagination into stunning visuals with our cutting-edge AI technology. 
-              From photorealistic portraits to abstract art, bring any vision to life.
-            </p>
-            <div className="mt-8 flex justify-center space-x-4">
-              <div className="flex items-center space-x-2 px-4 py-2 bg-white/60 backdrop-blur-sm rounded-full border border-white/20">
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                <span className="text-sm font-medium text-gray-700">AI Online</span>
-              </div>
-              <div className="flex items-center space-x-2 px-4 py-2 bg-white/60 backdrop-blur-sm rounded-full border border-white/20">
-                <span className="text-sm font-medium text-gray-700">⚡ Lightning Fast</span>
-              </div>
-              <div className="flex items-center space-x-2 px-4 py-2 bg-white/60 backdrop-blur-sm rounded-full border border-white/20">
-                <span className="text-sm font-medium text-gray-700">🎨 Unlimited Creativity</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 xl:grid-cols-5 gap-8 mb-16">
-            <div className="xl:col-span-2">
+        <main className="flex-grow flex flex-col overflow-hidden px-6 py-4">
+          <div className="flex-grow grid grid-cols-1 lg:grid-cols-12 gap-6 overflow-hidden max-w-[1600px] mx-auto w-full">
+            {/* Left Column: Form */}
+            <div className="lg:col-span-5 h-full overflow-y-auto pr-2 custom-scrollbar">
               <GenerationForm
                 onGenerate={generateImage}
                 isLoading={isLoading}
@@ -138,7 +115,8 @@ const ImageGenerator = () => {
               />
             </div>
             
-            <div className="xl:col-span-3">
+            {/* Right Column: Main Image Display */}
+            <div className="lg:col-span-7 h-full flex flex-col overflow-hidden">
               <ImageDisplay
                 image={currentImage}
                 isLoading={isLoading}
@@ -148,18 +126,19 @@ const ImageGenerator = () => {
             </div>
           </div>
 
-          {imageHistory.length > 0 && (
-            <div className="mt-16">
-              <ImageGallery
-                images={imageHistory}
-                onImageSelect={handleImageSelect}
-                onDownload={handleDownload}
-              />
-            </div>
-          )}
+          {/* Bottom Section: History */}
+          <div className="mt-6 h-48 flex-shrink-0">
+            <ImageGallery
+              images={imageHistory}
+              onImageSelect={handleImageSelect}
+              onDownload={handleDownload}
+            />
+          </div>
         </main>
 
-        <Footer />
+        <footer className="py-2 text-center text-[10px] font-black uppercase tracking-widest text-navy/30 font-varela">
+          Powered by AI Tool Pool
+        </footer>
       </div>
     </div>
   );

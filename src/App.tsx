@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { Sparkles, Zap, Shield } from 'lucide-react';
+import ImageGenerator from './components/ImageGenerator';
 
 const App: React.FC = () => {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [currentView, setCurrentView] = useState<'landing' | 'app'>('landing');
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -21,8 +23,12 @@ const App: React.FC = () => {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
+  if (currentView === 'app') {
+    return <ImageGenerator onBackToLanding={() => setCurrentView('landing')} />;
+  }
+
   return (
-    <div 
+    <div
       ref={containerRef}
       className="min-h-screen w-full relative overflow-hidden flex flex-col text-slate-900 bg-[#F0F2F5]"
     >
@@ -51,41 +57,68 @@ const App: React.FC = () => {
 
       {/* Logo in Upper Left */}
       <div className="absolute top-0 left-[-3rem] md:left-[-6rem] z-50 p-2">
-        <img 
-          src="/Gemini_Generated_Image_h7y6jnh7y6jnh7y6.webp" 
-          alt="SplashTool Logo" 
+        <img
+          src="/Gemini_Generated_Image_h7y6jnh7y6jnh7y6.webp"
+          alt="SplashTool Logo"
           className="w-72 md:w-[24rem] h-auto drop-shadow-2xl"
         />
       </div>
 
+      {/* Navigation Buttons - Upper Right */}
+      <nav className="absolute top-6 right-6 z-50 flex items-center gap-8">
+        <button className="relative px-4 py-2 text-base font-bold font-varela uppercase tracking-wider transition-all duration-300 active:scale-95 group overflow-hidden">
+          <span className="relative z-20 bg-gradient-to-r from-[#00B4FF] via-[#48E5B6] to-[#006D88] bg-clip-text text-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">Image</span>
+          <span className="absolute inset-0 z-20 flex items-center justify-center text-black group-hover:opacity-0 transition-opacity duration-300">Image</span>
+          <div className="absolute inset-0 z-10 bg-white opacity-0 group-hover:opacity-100 transition-opacity duration-800 rounded-lg"></div>
+          <div className="absolute inset-0 z-10 border-2 border-transparent rounded-lg transition-all duration-500 group-hover:border-[#00B4FF] group-hover:animate-border-draw group-hover:shadow-[0_0_20px_rgba(0,180,255,0.4),0_0_40px_rgba(72,229,182,0.3),0_0_60px_rgba(0,109,136,0.2)]"></div>
+        </button>
+        <button className="relative px-4 py-2 text-base font-bold font-varela uppercase tracking-wider transition-all duration-300 active:scale-95 group overflow-hidden">
+          <span className="relative z-20 bg-gradient-to-r from-[#00B4FF] via-[#48E5B6] to-[#006D88] bg-clip-text text-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">Video</span>
+          <span className="absolute inset-0 z-20 flex items-center justify-center text-black group-hover:opacity-0 transition-opacity duration-300">Video</span>
+          <div className="absolute inset-0 z-10 bg-white opacity-0 group-hover:opacity-100 transition-opacity duration-800 rounded-lg"></div>
+          <div className="absolute inset-0 z-10 border-2 border-transparent rounded-lg transition-all duration-500 group-hover:border-[#00B4FF] group-hover:animate-border-draw group-hover:shadow-[0_0_20px_rgba(0,180,255,0.4),0_0_40px_rgba(72,229,182,0.3),0_0_60px_rgba(0,109,136,0.2)]"></div>
+        </button>
+        <button className="relative px-4 py-2 text-base font-bold font-varela uppercase tracking-wider transition-all duration-300 active:scale-95 group overflow-hidden">
+          <span className="relative z-20 bg-gradient-to-r from-[#00B4FF] via-[#48E5B6] to-[#006D88] bg-clip-text text-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">Gallery</span>
+          <span className="absolute inset-0 z-20 flex items-center justify-center text-black group-hover:opacity-0 transition-opacity duration-300">Gallery</span>
+          <div className="absolute inset-0 z-10 bg-white opacity-0 group-hover:opacity-100 transition-opacity duration-800 rounded-lg"></div>
+          <div className="absolute inset-0 z-10 border-2 border-transparent rounded-lg transition-all duration-500 group-hover:border-[#00B4FF] group-hover:animate-border-draw group-hover:shadow-[0_0_20px_rgba(0,180,255,0.4),0_0_40px_rgba(72,229,182,0.3),0_0_60px_rgba(0,109,136,0.2)]"></div>
+        </button>
+        <button className="relative px-5 py-2 text-base font-bold font-varela uppercase tracking-wider border-2 border-black/20 rounded-lg transition-all duration-300 hover:border-[#48E5B6] active:scale-95 group overflow-hidden">
+          <span className="relative z-20 bg-gradient-to-r from-[#48E5B6] via-[#00B4FF] to-[#006D88] bg-clip-text text-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">Sign In</span>
+          <span className="absolute inset-0 z-20 flex items-center justify-center text-black group-hover:opacity-0 transition-opacity duration-300">Sign In</span>
+          <div className="absolute inset-0 z-10 bg-white opacity-0 group-hover:opacity-100 transition-opacity duration-800 rounded-lg"></div>
+        </button>
+      </nav>
+
       {/* Main Content */}
-      <main className="relative z-10 flex-grow flex flex-col justify-start items-center text-center px-6 pt-24 md:pt-32">
+      <main className="relative z-10 flex-grow flex flex-col justify-center items-center text-center px-6 pt-16">
         
         {/* Big Bold Headline */}
-        <h1 className="max-w-5xl mx-auto text-6xl md:text-8xl font-black tracking-tight leading-[0.9] mb-6 font-sniglet">
+        <h1 className="max-w-5xl mx-auto text-6xl md:text-8xl font-black tracking-tight leading-[0.9] mb-4 font-sniglet">
           <span className="block font-varela text-black drop-shadow-sm">Think. Prompt.</span>
-          <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#00B4FF] via-[#48E5B6] to-[#006D88] animate-gradient-x block filter drop-shadow-sm text-7xl md:text-[11rem] leading-none">
+          <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#00B4FF] via-[#48E5B6] to-[#006D88] animate-gradient-x block filter drop-shadow-sm text-7xl md:text-[10rem] leading-none">
             SPLASH
           </span>
         </h1>
 
         {/* Subtitle */}
-        <p className="max-w-lg mx-auto text-lg md:text-2xl text-slate-600 mb-10 font-varela font-bold tracking-wide">
+        <p className="max-w-lg mx-auto text-lg md:text-2xl text-slate-600 mb-8 font-varela font-bold tracking-wide">
           AI-powered image generation that flows like water
         </p>
 
         {/* Generate Button */}
-        <div className="mb-10 relative group">
-          <div 
+        <div className="mb-16 relative group">
+          <div
             className="absolute inset-0 blur-3xl opacity-60 group-hover:opacity-100 transition-opacity duration-500 animate-pulse-glow"
             style={{
               background: 'radial-gradient(circle, #48E5B6 0%, #00B4FF 50%, #006D88 100%)',
               transform: 'scale(1.2)',
             }}
           />
-          
-          <a 
-            href="#"
+
+          <button
+            onClick={() => setCurrentView('app')}
             className="relative z-10 inline-flex items-center justify-center px-16 py-5 text-xl md:text-2xl font-black tracking-wide text-white transition-all hover:-translate-y-2 active:translate-y-0 shadow-[0_20px_60px_rgba(0,109,136,0.5)] animate-float font-sniglet"
             style={{
               background: 'linear-gradient(135deg, #48E5B6 0%, #00B4FF 50%, #006D88 100%)',
@@ -97,14 +130,14 @@ const App: React.FC = () => {
             <div className="absolute inset-0 rounded-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{
               background: 'linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 60%)',
             }} />
-          </a>
+          </button>
         </div>
 
-        {/* Feature Cards - Slightly Smaller & Moved Up */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-12 px-4">
-          <div className="bg-white/95 backdrop-blur-sm p-6 rounded-20 shadow-2xl border-b-4 border-[#48E5B6] transform hover:-translate-y-1 transition-all duration-300">
-            <div className="w-14 h-14 bg-[#48E5B6]/15 rounded-2xl flex items-center justify-center mb-4 mx-auto">
-              <Sparkles className="text-[#48E5B6] w-8 h-8" />
+        {/* Feature Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-3xl mx-auto mb-0 -mt-4 px-4">
+          <div className="aspect-square bg-white/95 backdrop-blur-sm p-4 rounded-20 shadow-2xl border-b-4 border-[#48E5B6] transform hover:-translate-y-1 transition-all duration-300 flex flex-col items-center justify-center text-center">
+            <div className="w-12 h-12 bg-[#48E5B6]/15 rounded-2xl flex items-center justify-center mb-3">
+              <Sparkles className="text-[#48E5B6] w-7 h-7" />
             </div>
             <h3 className="text-lg font-black mb-2 font-sniglet text-black uppercase tracking-wide">Pure Magic</h3>
             <p className="text-slate-700 font-varela text-xs font-bold leading-relaxed">
@@ -112,9 +145,9 @@ const App: React.FC = () => {
             </p>
           </div>
 
-          <div className="bg-white/95 backdrop-blur-sm p-6 rounded-20 shadow-2xl border-b-4 border-[#00B4FF] transform hover:-translate-y-1 transition-all duration-300">
-            <div className="w-14 h-14 bg-[#00B4FF]/15 rounded-2xl flex items-center justify-center mb-4 mx-auto">
-              <Zap className="text-[#00B4FF] w-8 h-8" />
+          <div className="aspect-square bg-white/95 backdrop-blur-sm p-4 rounded-20 shadow-2xl border-b-4 border-[#00B4FF] transform hover:-translate-y-1 transition-all duration-300 flex flex-col items-center justify-center text-center">
+            <div className="w-12 h-12 bg-[#00B4FF]/15 rounded-2xl flex items-center justify-center mb-3">
+              <Zap className="text-[#00B4FF] w-7 h-7" />
             </div>
             <h3 className="text-lg font-black mb-2 font-sniglet text-black uppercase tracking-wide">Instant Flow</h3>
             <p className="text-slate-700 font-varela text-xs font-bold leading-relaxed">
@@ -122,9 +155,9 @@ const App: React.FC = () => {
             </p>
           </div>
 
-          <div className="bg-white/95 backdrop-blur-sm p-6 rounded-20 shadow-2xl border-b-4 border-[#006D88] transform hover:-translate-y-1 transition-all duration-300">
-            <div className="w-14 h-14 bg-[#006D88]/15 rounded-2xl flex items-center justify-center mb-4 mx-auto">
-              <Shield className="text-[#006D88] w-8 h-8" />
+          <div className="aspect-square bg-white/95 backdrop-blur-sm p-4 rounded-20 shadow-2xl border-b-4 border-[#006D88] transform hover:-translate-y-1 transition-all duration-300 flex flex-col items-center justify-center text-center">
+            <div className="w-12 h-12 bg-[#006D88]/15 rounded-2xl flex items-center justify-center mb-3">
+              <Shield className="text-[#006D88] w-7 h-7" />
             </div>
             <h3 className="text-lg font-black mb-2 font-sniglet text-black uppercase tracking-wide">Secure Stream</h3>
             <p className="text-slate-700 font-varela text-xs font-bold leading-relaxed">
@@ -136,7 +169,7 @@ const App: React.FC = () => {
       </main>
 
       {/* Footer */}
-      <footer className="w-full py-6 text-center relative z-10">
+      <footer className="w-full py-4 text-center relative z-10">
         <p className="text-[#006D88]/50 text-sm font-questrial">Powered by AI Tool Pool</p>
       </footer>
     </div>
