@@ -1,0 +1,194 @@
+{
+  // OpenCode Configuration for SplashTool Project
+  // This file configures MCP (Model Context Protocol) servers for AI-assisted development
+
+  // MCP Server Configuration
+  "mcpServers": {
+    // Neon PostgreSQL Database MCP Server
+    // Allows natural language interaction with your Neon Postgres database
+    // Official docs: https://neon.tech/docs/mcp
+    //
+    // SETUP REQUIRED:
+    // 1. Create .env.local file (not committed to git)
+    // 2. Add: NEON_API_KEY=your_api_key_here
+    // 3. Get API key from: https://console.neon.tech/app/account/api-keys
+    "neon": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@neondatabase/mcp-server-neon",
+        "start",
+        "REPLACE_WITH_YOUR_NEON_API_KEY"
+      ],
+      "description": "Neon PostgreSQL Database Management via MCP",
+      "capabilities": [
+        "database-query",
+        "schema-inspection",
+        "table-operations",
+        "data-manipulation"
+      ]
+    }
+  },
+
+  // Project Configuration
+  "project": {
+    "name": "SplashTool",
+    "description": "AI-powered image generation platform with user authentication",
+    "version": "1.0.0",
+    "type": "fullstack",
+
+    // Tech Stack
+    "technologies": {
+      "frontend": {
+        "framework": "React",
+        "language": "TypeScript",
+        "build": "Vite",
+        "styling": "Tailwind CSS"
+      },
+      "backend": {
+        "framework": "Fastify",
+        "language": "TypeScript",
+        "database": "PostgreSQL (Neon)",
+        "orm": "Prisma"
+      },
+      "ai": {
+        "imageGeneration": "N8N Workflow",
+        "webhook": "https://n8n.trendradar.ai/workflow/-EXH6f6ku5XwlRp2Hr1hh"
+      }
+    },
+
+    // Database Configuration
+    "database": {
+      "provider": "postgresql",
+      "host": "ep-fragrant-heart-ahzgp6ym-pooler.c-3.us-east-1.aws.neon.tech",
+      "database": "neondb",
+      "ssl": "require",
+      "connectionString": "postgresql://neondb_owner:npg_XTPw2W8GvgUB@ep-fragrant-heart-ahzgp6ym-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+    },
+
+    // Environment Variables
+    "environment": {
+      "required": [
+        "NEON_API_KEY",
+        "VITE_N8N_WEBHOOK_URL",
+        "DATABASE_URL",
+        "JWT_SECRET",
+        "JWT_REFRESH_SECRET"
+      ],
+      "frontend": {
+        "VITE_N8N_WEBHOOK_URL": "https://n8n.trendradar.ai/workflow/-EXH6f6ku5XwlRp2Hr1hh"
+      },
+      "backend": {
+        "DATABASE_URL": "postgresql://neondb_owner:npg_XTPw2W8GvgUB@ep-fragrant-heart-ahzgp6ym-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require",
+        "JWT_SECRET": "splash-tool-jwt-secret-key-2024-very-secure-random-string-make-it-long-and-complex-for-production",
+        "JWT_REFRESH_SECRET": "splash-tool-refresh-secret-key-2024-different-from-access-token-very-secure-and-long",
+        "PORT": 3001,
+        "NODE_ENV": "development"
+      }
+    },
+
+    // Development Scripts
+    "scripts": {
+      "dev": "npm run dev",
+      "build": "npm run build",
+      "test": "npm run test",
+      "backend:dev": "cd backend && npm run dev",
+      "backend:test": "cd backend && ./test-auth.sh",
+      "backend:deploy": "cd backend && ./deploy.sh"
+    },
+
+    // MCP Server Commands (for AI assistance)
+    "mcpCommands": {
+      "database": {
+        "listTables": "List all tables in the database",
+        "describeTable": "Describe a specific table structure",
+        "queryData": "Execute read-only SQL queries",
+        "createTable": "Create new database tables",
+        "migrateData": "Run database migrations"
+      },
+      "authentication": {
+        "registerUser": "Register a new user account",
+        "loginUser": "Authenticate user login",
+        "verifyToken": "Verify JWT access token",
+        "refreshToken": "Refresh access token",
+        "getProfile": "Get user profile information"
+      },
+      "images": {
+        "generateImage": "Generate AI image via N8N webhook",
+        "listUserImages": "List user's generated images",
+        "saveImage": "Save generated image to database"
+      }
+    }
+  },
+
+  // AI Assistant Configuration
+  "ai": {
+    "model": "claude-3-5-sonnet-20241022",
+    "temperature": 0.7,
+    "maxTokens": 4096,
+
+    // Context for AI assistance
+    "context": {
+      "projectOverview": "SplashTool is an AI-powered image generation platform built with React frontend and Fastify backend, using Neon PostgreSQL database and N8N for AI image generation workflows.",
+      "architecture": "Full-stack TypeScript application with JWT authentication, real-time image generation, and comprehensive user management.",
+      "keyFeatures": [
+        "User authentication with JWT tokens",
+        "AI image generation via N8N webhooks",
+        "Responsive React frontend with animations",
+        "Fastify API with comprehensive validation",
+        "PostgreSQL database with Prisma ORM",
+        "Production-ready deployment scripts"
+      ]
+    },
+
+    // Code Style Guidelines
+    "codeStyle": {
+      "typescript": {
+        "strict": true,
+        "noImplicitAny": true,
+        "exactOptionalPropertyTypes": true
+      },
+      "react": {
+        "hooks": true,
+        "functionalComponents": true,
+        "typescript": true
+      },
+      "backend": {
+        "asyncAwait": true,
+        "errorHandling": true,
+        "validation": true
+      }
+    }
+  },
+
+  // Development Environment
+  "development": {
+    "ports": {
+      "frontend": 5173,
+      "backend": 3001
+    },
+    "database": {
+      "studio": "npx prisma studio",
+      "migrate": "npx prisma db push",
+      "generate": "npx prisma generate"
+    },
+    "testing": {
+      "auth": "./backend/test-auth.sh",
+      "unit": "npm run test",
+      "e2e": "npm run test:e2e"
+    }
+  },
+
+  // Security Notes
+  "security": {
+    "warning": "NEVER commit API keys to version control. Always use environment variables.",
+    "requiredEnvVars": [
+      "NEON_API_KEY - From Neon dashboard (API Keys section)",
+      "VITE_N8N_WEBHOOK_URL - N8N workflow endpoint",
+      "DATABASE_URL - Neon connection string",
+      "JWT_SECRET - Random secure string for JWT signing",
+      "JWT_REFRESH_SECRET - Different random secure string for refresh tokens"
+    ],
+    "regenerateKey": "If API key was exposed, immediately regenerate it in Neon dashboard"
+  }
+}
