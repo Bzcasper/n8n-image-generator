@@ -7,6 +7,28 @@ const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<'landing' | 'app'>('landing');
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Handle browser back/forward navigation
+  useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      if (event.state?.view) {
+        setCurrentView(event.state.view);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  const navigateToApp = () => {
+    setCurrentView('app');
+    window.history.pushState({ view: 'app' }, 'SplashTool - App', '/app');
+  };
+
+  const navigateToLanding = () => {
+    setCurrentView('landing');
+    window.history.pushState({ view: 'landing' }, 'SplashTool - Landing', '/');
+  };
+
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (!containerRef.current) return;
@@ -24,7 +46,7 @@ const App: React.FC = () => {
   }, []);
 
   if (currentView === 'app') {
-    return <ImageGenerator onBackToLanding={() => setCurrentView('landing')} />;
+    return <ImageGenerator onBackToLanding={navigateToLanding} />;
   }
 
   return (
@@ -55,8 +77,8 @@ const App: React.FC = () => {
         }}
       />
 
-      {/* Logo in Upper Left */}
-      <div className="absolute top-0 left-[-3rem] md:left-[-6rem] z-50 p-2">
+      {/* Logo in Upper Left - Clickable */}
+      <div className="absolute top-0 left-[-3rem] md:left-[-6rem] z-50 p-2 cursor-pointer hover:scale-105 transition-transform duration-300" onClick={navigateToApp}>
         <img
           src="/Gemini_Generated_Image_h7y6jnh7y6jnh7y6.webp"
           alt="SplashTool Logo"
@@ -66,7 +88,7 @@ const App: React.FC = () => {
 
       {/* Navigation Buttons - Upper Right */}
       <nav className="absolute top-6 right-6 z-50 flex items-center gap-8">
-        <button className="relative px-4 py-2 text-base font-bold font-varela uppercase tracking-wider transition-all duration-300 active:scale-95 group overflow-hidden">
+        <button onClick={navigateToApp} className="relative px-4 py-2 text-base font-bold font-varela uppercase tracking-wider transition-all duration-300 active:scale-95 group overflow-hidden">
           <span className="relative z-20 bg-gradient-to-r from-[#00B4FF] via-[#48E5B6] to-[#006D88] bg-clip-text text-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">Image</span>
           <span className="absolute inset-0 z-20 flex items-center justify-center text-black group-hover:opacity-0 transition-opacity duration-300">Image</span>
           <div className="absolute inset-0 z-10 bg-white opacity-0 group-hover:opacity-100 transition-opacity duration-800 rounded-lg"></div>
@@ -118,7 +140,7 @@ const App: React.FC = () => {
           />
 
           <button
-            onClick={() => setCurrentView('app')}
+            onClick={navigateToApp}
             className="relative z-10 inline-flex items-center justify-center px-16 py-5 text-xl md:text-2xl font-black tracking-wide text-white transition-all hover:-translate-y-2 active:translate-y-0 shadow-[0_20px_60px_rgba(0,109,136,0.5)] animate-float font-sniglet"
             style={{
               background: 'linear-gradient(135deg, #48E5B6 0%, #00B4FF 50%, #006D88 100%)',
