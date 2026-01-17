@@ -86,25 +86,6 @@ export function Home() {
 
       {/* Navigation Buttons - Upper Right */}
       <nav className="absolute top-6 right-6 z-50 flex items-center gap-8">
-        <button onClick={navigateToApp} className="relative px-4 py-2 text-base font-bold font-varela uppercase tracking-wider transition-all duration-300 active:scale-95 group overflow-hidden">
-          <span className="relative z-20 bg-gradient-to-r from-[#00B4FF] via-[#48E5B6] to-[#006D88] bg-clip-text text-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">Image</span>
-          <span className="absolute inset-0 z-20 flex items-center justify-center text-black group-hover:opacity-0 transition-opacity duration-300">Image</span>
-          <div className="absolute inset-0 z-10 bg-white opacity-0 group-hover:opacity-100 transition-opacity duration-800 rounded-lg"></div>
-          <div className="absolute inset-0 z-10 border-2 border-transparent rounded-lg transition-all duration-500 group-hover:border-[#00B4FF] group-hover:animate-border-draw group-hover:shadow-[0_0_20px_rgba(0,180,255,0.4),0_0_40px_rgba(72,229,182,0.3),0_0_60px_rgba(0,109,136,0.2)]"></div>
-        </button>
-        <button className="relative px-4 py-2 text-base font-bold font-varela uppercase tracking-wider transition-all duration-300 active:scale-95 group overflow-hidden">
-          <span className="relative z-20 bg-gradient-to-r from-[#00B4FF] via-[#48E5B6] to-[#006D88] bg-clip-text text-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">Video</span>
-          <span className="absolute inset-0 z-20 flex items-center justify-center text-black group-hover:opacity-0 transition-opacity duration-300">Video</span>
-          <div className="absolute inset-0 z-10 bg-white opacity-0 group-hover:opacity-100 transition-opacity duration-800 rounded-lg"></div>
-          <div className="absolute inset-0 z-10 border-2 border-transparent rounded-lg transition-all duration-500 group-hover:border-[#00B4FF] group-hover:animate-border-draw group-hover:shadow-[0_0_20px_rgba(0,180,255,0.4),0_0_40px_rgba(72,229,182,0.3),0_0_60px_rgba(0,109,136,0.2)]"></div>
-        </button>
-        <button className="relative px-4 py-2 text-base font-bold font-varela uppercase tracking-wider transition-all duration-300 active:scale-95 group overflow-hidden">
-          <span className="relative z-20 bg-gradient-to-r from-[#00B4FF] via-[#48E5B6] to-[#006D88] bg-clip-text text-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">Gallery</span>
-          <span className="absolute inset-0 z-20 flex items-center justify-center text-black group-hover:opacity-0 transition-opacity duration-300">Gallery</span>
-          <div className="absolute inset-0 z-10 bg-white opacity-0 group-hover:opacity-100 transition-opacity duration-800 rounded-lg"></div>
-          <div className="absolute inset-0 z-10 border-2 border-transparent rounded-lg transition-all duration-500 group-hover:border-[#00B4FF] group-hover:animate-border-draw group-hover:shadow-[0_0_20px_rgba(0,180,255,0.4),0_0_40px_rgba(72,229,182,0.3),0_0_60px_rgba(0,109,136,0.2)]"></div>
-        </button>
-        
         {isAuthenticated ? (
           <button
             onClick={() => navigate('/account/profile')}

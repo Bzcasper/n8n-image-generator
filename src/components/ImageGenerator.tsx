@@ -42,12 +42,13 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({ onBackToLanding }) => {
   }, []);
 
   useEffect(() => {
+    const urls = objectUrlsRef.current;
     return () => {
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
       }
-      objectUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
-      objectUrlsRef.current.clear();
+      urls.forEach((url) => URL.revokeObjectURL(url));
+      urls.clear();
     };
   }, []);
 
