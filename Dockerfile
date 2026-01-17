@@ -1,32 +1,42 @@
-# Build stage
-FROM node:18-alpine AS build
+# Build stage for frontend
+FROM node:18-alpine AS frontend-build
 
 WORKDIR /app
 
-# Copy package files
+# Copy frontend package files
 COPY package*.json ./
 
-# Install dependencies
+# Install frontend dependencies
 RUN npm ci
 
-# Copy source code
+# Copy frontend source code
 COPY . .
 
-# SECURITY: Environment variables should be passed at runtime using:
-# - Docker: docker run -e VAR_NAME=value
-# - Docker Compose: environment: section in docker-compose.yml
-# - For production, consider Docker secrets or a secrets management service
-# (e.g., AWS Secrets Manager, HashiCorp Vault)
-# NEVER include .env files in Docker images as they bake secrets into the image
-
-# Build the app
+# Build frontend
 RUN npm run build
 
-# Production stage
-FROM nginx:alpine
+# Build stage for backend
+FROM node:18-alpine AS backend-build
 
-# Copy built app from build stage
-COPY --from=build /app/dist /usr/share/nginx/html
+WORKDIR /app
+
+# Copy backend package files
+COPY backend/package*.json ./
+
+# Install backend dependencies
+RUN npm ci
+
+# Copy backend source code
+COPY backend/ ./
+
+# Build backend
+RUN npm run build
+
+# Production stage for frontend
+FROM nginx:alpine AS frontend
+
+# Copy built frontend
+COPY --from=frontend-build /app/dist /usr/share/nginx/html
 
 # Copy nginx configuration
 COPY nginx.conf /etc/nginx/conf.d/default.conf
@@ -34,3 +44,21 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80
 
 CMD ["nginx", "-g", "daemon off;"]
+
+# Production stage for backend
+FROM node:18-alpine AS backend
+
+WORKDIR /app
+
+# Copy backend dependencies and built code
+COPY --from=backend-build /app/node_modules ./node_modules
+COPY --from=backend-build /app/dist ./dist
+COPY --from=backend-build /app/prisma ./prisma
+COPY --from=backend-build /app/package*.json ./
+
+# Generate Prisma client
+RUN npx prisma generate
+
+EXPOSE 3001
+
+CMD ["node", "dist/server.js"]
