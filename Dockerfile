@@ -40,4 +40,10 @@ COPY --from=backend-build /app/dist ./dist
 COPY --from=backend-build /app/prisma ./prisma
 COPY --from=backend-build /app/package*.json ./
 
+# Copy and make startup script executable
+COPY start.sh /app/start.sh
+RUN chmod +x /app/start.sh
+
 EXPOSE 80 3001
+
+CMD ["/app/start.sh"]
