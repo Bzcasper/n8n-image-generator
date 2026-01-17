@@ -1,56 +1,35 @@
-# Build stage for frontend
-FROM node:18-alpine AS frontend-build
+# Base image with Node.js
+FROM node:18-alpine AS base
 
 WORKDIR /app
-
-# Copy frontend package files
-COPY package*.json ./
-
-# Install frontend dependencies
-RUN npm ci
-
-# Copy frontend source code
-COPY . .
 
 # Build frontend
-RUN npm run build
+FROM base AS frontend-build
 
-# Build stage for backend
-FROM node:18-alpine AS backend-build
-
-WORKDIR /app
-
-# Copy backend package files
-COPY backend/package*.json ./
-
-# Install backend dependencies
+COPY package*.json ./
 RUN npm ci
 
-# Copy backend source code
-COPY backend/ ./
-
-# Build backend
+COPY . .
 RUN npm run build
 
-# Production stage for frontend
-FROM nginx:alpine AS frontend
+# Build backend
+FROM base AS backend-build
 
-# Copy built frontend
-COPY --from=frontend-build /app/dist /usr/share/nginx/html
+COPY backend/package*.json ./
+RUN npm ci
 
-# Copy nginx configuration
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY backend/ ./
+RUN npm run build
 
-EXPOSE 80
-
-CMD ["nginx", "-g", "daemon off;"]
-
-# Production stage for backend
-FROM node:18-alpine AS backend
+# Final multi-arch image that can run either service
+FROM node:18-alpine
 
 WORKDIR /app
 
-# Copy backend dependencies and built code
+# Install nginx for frontend serving
+RUN apk add --no-cache nginx
+
+# Copy backend build artifacts
 COPY --from=backend-build /app/node_modules ./node_modules
 COPY --from=backend-build /app/dist ./dist
 COPY --from=backend-build /app/prisma ./prisma
@@ -59,6 +38,21 @@ COPY --from=backend-build /app/package*.json ./
 # Generate Prisma client
 RUN npx prisma generate
 
-EXPOSE 3001
+# Copy frontend build to nginx location
+COPY --from=frontend-build /app/dist /usr/share/nginx/html
 
-CMD ["node", "dist/server.js"]
+# Copy nginx config
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Expose both ports
+EXPOSE 80 3001
+
+# Use a startup script to run the appropriate process
+RUN echo '#!/bin/sh\n\
+if [ "$SERVICE" = "app" ]; then\n\
+  exec nginx -g "daemon off;"\n\
+elif [ "$SERVICE" = "backend" ]; then\n\
+  exec node dist/server.js\n\
+fi\n' > /entrypoint.sh && chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
