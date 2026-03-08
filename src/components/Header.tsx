@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Sparkles, ArrowLeft, LogOut, User } from 'lucide-react';
+import { Sparkles, ArrowLeft, LogOut, User, Menu, X } from 'lucide-react';
 import { useAuth } from '../lib/backendAuth';
 
 interface HeaderProps {
@@ -10,48 +10,58 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ onBackToLanding }) => {
   const { isAuthenticated, user, logout } = useAuth();
   const navigate = useNavigate();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleLogout = async () => {
     await logout();
+    setIsMenuOpen(false);
     navigate('/auth/login');
   };
 
   return (
-    <header className="bg-white/90 backdrop-blur-md border-b border-navy/10 sticky top-0 z-50 py-3">
-      <div className="container mx-auto px-6">
-        <div className="flex items-center justify-center relative">
+    <header className="bg-white/90 backdrop-blur-md border-b border-navy/10 sticky top-0 z-50 py-2 md:py-3">
+      <div className="container mx-auto px-4 md:px-6">
+        <div className="flex items-center justify-between md:justify-center relative">
           {/* Back to Landing Button */}
           {onBackToLanding && (
             <button
               onClick={onBackToLanding}
-              className="absolute left-0 flex items-center gap-2 px-3 py-1.5 border-2 border-navy/5 rounded-xl text-navy hover:text-blue hover:border-blue/20 transition-all font-varela group"
+              className="flex items-center gap-1 md:gap-2 px-2 md:px-3 py-1 md:py-1.5 border-2 border-navy/5 rounded-lg md:rounded-xl text-navy hover:text-blue hover:border-blue/20 transition-all font-varela group"
             >
-              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-              <span className="text-sm font-bold uppercase tracking-wider">Back</span>
+              <ArrowLeft className="w-3.5 h-3.5 md:w-4 md:h-4 group-hover:-translate-x-1 transition-transform" />
+              <span className="text-[10px] md:text-sm font-bold uppercase tracking-wider">Back</span>
             </button>
           )}
 
-          {/* Logo on the left for navigation if needed, but centering "SplashTool" as requested */}
-          <div className="flex flex-col items-center">
-            <div className="flex items-center space-x-2">
-              <Sparkles className="w-6 h-6 text-mint animate-pulse" />
-              <h1 className="text-4xl font-black font-sniglet tracking-tight">
+          {/* Logo - Centered on Desktop, Adaptive on Mobile */}
+          <div className="flex flex-col items-center flex-grow">
+            <div className="flex items-center space-x-1.5 md:space-x-2">
+              <Sparkles className="w-4 h-4 md:w-6 md:h-6 text-mint animate-pulse" />
+              <h1 className="text-2xl md:text-4xl font-black font-sniglet tracking-tight">
                 <span className="text-black">Splash</span>
                 <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue via-mint to-navy">Tool</span>
               </h1>
             </div>
-            <p className="text-[10px] uppercase tracking-[0.2em] font-black text-navy/40 font-varela -mt-1">
+            <p className="hidden md:block text-[10px] uppercase tracking-[0.2em] font-black text-navy/40 font-varela -mt-1">
               AI-Powered Generation
             </p>
           </div>
 
-          {/* Navigation / User Menu */}
-          <div className="absolute right-0 hidden md:flex items-center space-x-4">
+          {/* Mobile Menu Button */}
+          <button 
+            className="md:hidden p-2 text-navy"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
+            {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
+
+          {/* Desktop Navigation / User Menu */}
+          <div className="hidden md:flex absolute right-0 items-center space-x-4">
             {isAuthenticated && user ? (
               <>
                 <div className="flex items-center gap-2 text-navy font-varela">
                   <User className="w-4 h-4" />
-                  <span className="text-sm font-bold">{user.username || user.email}</span>
+                  <span className="text-sm font-bold truncate max-w-[100px]">{user.username || user.email}</span>
                 </div>
                 <button
                   onClick={handleLogout}
@@ -75,6 +85,56 @@ const Header: React.FC<HeaderProps> = ({ onBackToLanding }) => {
           </div>
         </div>
       </div>
+
+      {/* Mobile Menu Overlay */}
+      {isMenuOpen && (
+        <div className="md:hidden absolute top-full left-0 w-full bg-white/95 backdrop-blur-xl border-b border-navy/10 shadow-xl py-6 px-6 animate-in fade-in slide-in-from-top duration-300 z-40">
+          <div className="flex flex-col space-y-4">
+            {isAuthenticated && user ? (
+              <>
+                <div className="flex items-center gap-3 p-3 bg-navy/5 rounded-xl">
+                  <User className="w-5 h-5 text-navy" />
+                  <div>
+                    <p className="text-xs font-black text-navy/40 uppercase tracking-widest">Signed in as</p>
+                    <p className="text-sm font-bold text-navy">{user.username || user.email}</p>
+                  </div>
+                </div>
+                <Link 
+                  to="/account/profile" 
+                  className="text-lg font-black font-sniglet text-navy uppercase tracking-wide py-2"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Dashboard
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-2 text-lg font-black font-sniglet text-red-500 uppercase tracking-wide py-2"
+                >
+                  <LogOut className="w-5 h-5" />
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <Link 
+                  to="/" 
+                  className="text-lg font-black font-sniglet text-navy uppercase tracking-wide py-2"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Home
+                </Link>
+                <Link 
+                  to="/auth/login" 
+                  className="text-lg font-black font-sniglet text-blue uppercase tracking-wide py-2"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Login
+                </Link>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </header>
   );
 };

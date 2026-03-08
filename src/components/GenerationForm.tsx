@@ -58,8 +58,8 @@ const GenerationForm: React.FC<GenerationFormProps> = ({ onGenerate, isLoading, 
     return MODELS.find(m => m.id === model) || MODELS[0];
   }, [model]);
 
-  const handleSubmit = useCallback((e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = useCallback((e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (message.trim() && !isLoading) {
       onGenerate({
         message: message.trim(),
@@ -109,7 +109,7 @@ const GenerationForm: React.FC<GenerationFormProps> = ({ onGenerate, isLoading, 
   const isFormValid = message.trim().length >= 3 && message.trim().length <= 500;
 
   return (
-    <div className="bg-white/90 backdrop-blur-md rounded-20 shadow-xl p-3 md:p-4 border border-navy/10 h-full flex flex-col min-h-0 overflow-hidden">
+    <div className="bg-white/90 backdrop-blur-md rounded-20 shadow-xl p-3 md:p-4 border border-navy/10 h-full flex flex-col min-h-0 overflow-hidden relative">
       <div className="flex items-center space-x-3 mb-3 flex-shrink-0">
         <div className="p-2 bg-navy/5 rounded-lg">
           <Wand2 className="w-5 h-5 text-navy" />
@@ -122,7 +122,7 @@ const GenerationForm: React.FC<GenerationFormProps> = ({ onGenerate, isLoading, 
 
       <form onSubmit={handleSubmit} className="flex-grow flex flex-col min-h-0 overflow-hidden">
         {/* Scrollable Form Body */}
-        <div className="flex-grow overflow-y-auto pr-1 space-y-4 custom-scrollbar">
+        <div className="flex-grow overflow-y-auto pr-1 space-y-4 custom-scrollbar pb-24 lg:pb-0">
           <div className="space-y-1">
             <label htmlFor="message" className="block text-[11px] font-black font-varela text-navy uppercase tracking-widest">
               Prompt
@@ -297,48 +297,62 @@ const GenerationForm: React.FC<GenerationFormProps> = ({ onGenerate, isLoading, 
               </div>
             </div>
           )}
-        </div>
 
-        {/* Fixed Footer with Button */}
-        <div className="pt-4 mt-auto border-t border-navy/5 bg-white/50 backdrop-blur-sm -mx-4 px-4 pb-2 flex-shrink-0">
+          {/* Error Message Display */}
           {error && (
-            <div className="p-2 mb-2 bg-red-50 border-2 border-red-100 rounded-xl">
-              <p className="text-[10px] text-red-600 font-bold font-varela leading-tight">{error}</p>
+            <div className="p-3 bg-red-50 border-2 border-red-100 rounded-xl animate-in fade-in zoom-in duration-300">
+              <p className="text-[11px] text-red-600 font-bold font-varela leading-tight">{error}</p>
             </div>
           )}
-
-          <div className="relative group">
-            <div 
-              className="absolute -inset-1 blur-xl opacity-20 group-hover:opacity-40 transition-opacity duration-500 animate-pulse-glow"
-              style={{
-                background: 'radial-gradient(circle, #48E5B6 0%, #00B4FF 50%, #006D88 100%)',
-              }}
-            />
-            
-            <button
-              type="submit"
-              disabled={!isFormValid || isLoading}
-              className="relative w-full text-white py-3.5 px-6 border-2 border-white/20 rounded-xl font-black font-sniglet text-base uppercase tracking-widest disabled:opacity-40 disabled:cursor-not-allowed hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 shadow-xl"
-              style={{
-                background: 'linear-gradient(135deg, #48E5B6 0%, #00B4FF 50%, #006D88 100%)',
-              }}
-            >
-              {isLoading ? (
-                <div className="flex items-center justify-center space-x-2">
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  <span className="text-sm">Generating...</span>
-                </div>
-              ) : (
-                <div className="flex items-center justify-center space-x-2">
-                  <WandSparkles className="w-5 h-5" />
-                  <span className="text-base">Splash It!</span>
-                  <Sparkles className="w-5 h-5" />
-                </div>
-              )}
-            </button>
-          </div>
         </div>
       </form>
+
+      {/* Floating Action Button: Splash It! */}
+      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 w-full max-w-[320px] md:max-w-md px-4 pointer-events-none">
+        <div className="pointer-events-auto relative group">
+          <div 
+            className={`absolute -inset-2 blur-2xl opacity-40 group-hover:opacity-70 transition-all duration-700 animate-float ${
+              isFormValid && !isLoading ? 'block' : 'hidden'
+            }`}
+            style={{
+              background: 'radial-gradient(circle, #48E5B6 0%, #00B4FF 50%, #006D88 100%)',
+            }}
+          />
+          <div 
+            className={`absolute -inset-1 blur-xl opacity-60 animate-pulse-glow ${
+              isLoading ? 'block' : 'hidden'
+            }`}
+            style={{
+              background: 'linear-gradient(135deg, #48E5B6 0%, #00B4FF 50%, #006D88 100%)',
+            }}
+          />
+          
+          <button
+            onClick={() => handleSubmit()}
+            disabled={!isFormValid || isLoading}
+            className="relative w-full text-white py-4 md:py-5 px-8 border-2 border-white/30 rounded-full font-black font-sniglet text-lg md:text-xl uppercase tracking-widest disabled:opacity-40 disabled:cursor-not-allowed hover:scale-105 active:scale-95 transition-all duration-300 shadow-[0_20px_50px_rgba(0,109,136,0.5)] flex items-center justify-center space-x-3 overflow-hidden"
+            style={{
+              background: 'linear-gradient(135deg, #48E5B6 0%, #00B4FF 50%, #006D88 100%)',
+            }}
+          >
+            {isLoading ? (
+              <>
+                <div className="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
+                <span>Generating...</span>
+              </>
+            ) : (
+              <>
+                <WandSparkles className="w-6 h-6 animate-pulse" />
+                <span>Splash It!</span>
+                <Sparkles className="w-6 h-6" />
+              </>
+            )}
+            
+            {/* Glossy overlay */}
+            <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

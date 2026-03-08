@@ -34,62 +34,22 @@ export function Auth() {
   };
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        minHeight: '100vh',
-        background: 'linear-gradient(135deg, #48E5B6 0%, #00B4FF 50%, #006D88 100%)',
-        padding: '2rem',
-      }}
-    >
+    <div className="flex flex-col justify-center items-center min-h-screen bg-gradient-to-br from-[#48E5B6] via-[#00B4FF] to-[#006D88] p-6">
       {/* Logo */}
       <div
-        style={{
-          marginBottom: '2rem',
-          cursor: 'pointer',
-          transition: 'transform 0.3s',
-        }}
+        className="mb-8 cursor-pointer hover:scale-105 transition-transform duration-300 w-full max-w-[300px] md:max-w-[500px]"
         onClick={() => navigate('/')}
-        onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-        onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
       >
         <img
           src="/Gemini_Generated_Image_h7y6jnh7y6jnh7y6.webp"
           alt="SplashTool Logo"
-          style={{
-            width: '700px',
-            height: 'auto',
-            filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))',
-          }}
+          className="w-full h-auto drop-shadow-xl"
         />
       </div>
 
       {/* Auth Form Container */}
-      <div
-        style={{
-          background: 'rgba(255, 255, 255, 0.95)',
-          backdropFilter: 'blur(10px)',
-          borderRadius: '20px',
-          padding: '2rem',
-          boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)',
-          border: '1px solid rgba(255, 255, 255, 0.2)',
-          maxWidth: '400px',
-          width: '100%',
-        }}
-      >
-        <h2
-          style={{
-            fontSize: '2rem',
-            fontWeight: '800',
-            marginBottom: '1.5rem',
-            textAlign: 'center',
-            fontFamily: 'Sniglet, cursive',
-            color: '#006D88',
-          }}
-        >
+      <div className="bg-white/95 backdrop-blur-md rounded-20 p-6 md:p-10 shadow-2xl border border-white/20 max-w-[450px] w-full transform animate-fade-in-up">
+        <h2 className="text-3xl md:text-4xl font-black mb-8 text-center font-sniglet text-[#006D88] uppercase tracking-tight">
           {isLoginMode ? 'Welcome Back!' : 'Create Account'}
         </h2>
 

@@ -74,229 +74,131 @@ export function Account() {
   const currentTierData = TIERS.find(t => t.id === currentTier) || TIERS[0];
 
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        background: 'linear-gradient(135deg, #48E5B6 0%, #00B4FF 50%, #006D88 100%)',
-        padding: '2rem',
-      }}
-    >
+    <div className="min-h-screen bg-gradient-to-br from-[#48E5B6] via-[#00B4FF] to-[#006D88] p-4 md:p-8">
       {/* Header */}
-      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: '2rem',
-          }}
-        >
-          <div
-            style={{ cursor: 'pointer' }}
-            onClick={() => navigate('/')}
-          >
+      <div className="max-w-[1200px] mx-auto w-full">
+        <div className="flex justify-between items-center mb-8">
+          <div className="cursor-pointer" onClick={() => navigate('/')}>
             <img
               src="/Gemini_Generated_Image_h7y6jnh7y6jnh7y6.webp"
               alt="SplashTool"
-              style={{ width: '150px', height: 'auto' }}
+              className="w-32 md:w-40 h-auto"
             />
           </div>
           <button
             onClick={handleLogout}
-            style={{
-              padding: '0.75rem 1.5rem',
-              background: 'rgba(255,255,255,0.2)',
-              border: 'none',
-              borderRadius: '12px',
-              color: 'white',
-              fontWeight: 'bold',
-              cursor: 'pointer',
-            }}
+            className="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-xl font-bold transition-all"
           >
             Sign Out
           </button>
         </div>
 
         {/* User Info */}
-        <div
-          style={{
-            background: 'rgba(255,255,255,0.95)',
-            borderRadius: '20px',
-            padding: '1.5rem',
-            marginBottom: '2rem',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
-          <div>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#1F2937' }}>
+        <div className="bg-white/95 backdrop-blur-md rounded-20 p-6 mb-8 flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="text-center md:text-left">
+            <h2 className="text-2xl font-black text-gray-800 font-sniglet">
               Welcome, {user?.username || 'User'}!
             </h2>
-            <p style={{ color: '#6B7280', fontSize: '0.875rem' }}>{user?.email}</p>
+            <p className="text-gray-500 font-varela">{user?.email}</p>
           </div>
           <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              padding: '0.5rem 1rem',
-              background: `linear-gradient(135deg, ${currentTierData.color}20, ${currentTierData.color}40)`,
-              borderRadius: '12px',
-              border: `2px solid ${currentTierData.color}`,
+            className="flex items-center gap-2 px-4 py-2 rounded-xl border-2"
+            style={{ 
+              borderColor: currentTierData.color,
+              background: `${currentTierData.color}15`
             }}
           >
             <Crown size={20} style={{ color: currentTierData.color }} />
-            <span style={{ fontWeight: 'bold', color: currentTierData.color, textTransform: 'uppercase' }}>
+            <span className="font-black uppercase tracking-wider" style={{ color: currentTierData.color }}>
               {currentTierData.name}
             </span>
           </div>
         </div>
 
         {/* Current Plan Stats */}
-        <div
-          style={{
-            background: 'rgba(255,255,255,0.95)',
-            borderRadius: '20px',
-            padding: '1.5rem',
-            marginBottom: '2rem',
-          }}
-        >
-          <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1rem', color: '#1F2937' }}>
-            Your Plan
+        <div className="bg-white/95 backdrop-blur-md rounded-20 p-6 mb-8">
+          <h3 className="text-xl font-black mb-6 text-gray-800 font-sniglet uppercase tracking-tight">
+            Your Usage
           </h3>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
-            <div style={{ textAlign: 'center', padding: '1rem', background: '#F9FAFB', borderRadius: '12px' }}>
-              <Zap size={24} style={{ color: '#48E5B6', margin: '0 auto 0.5rem' }} />
-              <p style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#1F2937' }}>
-                {currentTierData.dailyLimit}
-              </p>
-              <p style={{ fontSize: '0.75rem', color: '#6B7280' }}>Daily Generations</p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="text-center p-4 bg-gray-50 rounded-xl border border-gray-100">
+              <Zap size={24} className="text-[#48E5B6] mx-auto mb-2" />
+              <p className="text-2xl font-black text-gray-800">{currentTierData.dailyLimit}</p>
+              <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">Daily Generations</p>
             </div>
-            <div style={{ textAlign: 'center', padding: '1rem', background: '#F9FAFB', borderRadius: '12px' }}>
-              <Star size={24} style={{ color: '#00B4FF', margin: '0 auto 0.5rem' }} />
-              <p style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#1F2937' }}>
-                {currentTierData.models.length}
-              </p>
-              <p style={{ fontSize: '0.75rem', color: '#6B7280' }}>Available Models</p>
+            <div className="text-center p-4 bg-gray-50 rounded-xl border border-gray-100">
+              <Star size={24} className="text-[#00B4FF] mx-auto mb-2" />
+              <p className="text-2xl font-black text-gray-800">{currentTierData.models.length}</p>
+              <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">Available Models</p>
             </div>
-            <div style={{ textAlign: 'center', padding: '1rem', background: '#F9FAFB', borderRadius: '12px' }}>
-              <Crown size={24} style={{ color: '#006D88', margin: '0 auto 0.5rem' }} />
-              <p style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#1F2937' }}>
-                {currentTierData.price}
-              </p>
-              <p style={{ fontSize: '0.75rem', color: '#6B7280' }}>{currentTierData.period}</p>
+            <div className="text-center p-4 bg-gray-50 rounded-xl border border-gray-100">
+              <Crown size={24} className="text-[#006D88] mx-auto mb-2" />
+              <p className="text-2xl font-black text-gray-800">{currentTierData.price}</p>
+              <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{currentTierData.period}</p>
             </div>
           </div>
         </div>
 
         {/* Upgrade Plans */}
-        <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1.5rem', color: 'white', textAlign: 'center' }}>
+        <h3 className="text-3xl font-black mb-8 text-white text-center font-sniglet drop-shadow-md">
           Upgrade Your Plan
         </h3>
         
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem' }}>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {TIERS.map((tier) => (
             <div
               key={tier.id}
-              style={{
-                background: 'rgba(255,255,255,0.95)',
-                borderRadius: '20px',
-                padding: '1.5rem',
-                position: 'relative',
-                border: currentTier === tier.id ? `3px solid ${tier.color}` : '3px solid transparent',
-                transform: tier.popular ? 'scale(1.05)' : 'scale(1)',
-              }}
+              className={`bg-white/95 backdrop-blur-md rounded-20 p-6 relative transition-all duration-300 flex flex-col ${
+                currentTier === tier.id ? 'ring-4 ring-offset-2 scale-100' : 'hover:-translate-y-1'
+              }`}
+              style={{ ringColor: tier.color }}
             >
               {tier.popular && (
                 <div
-                  style={{
-                    position: 'absolute',
-                    top: '-12px',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    background: `linear-gradient(135deg, ${tier.color}, ${tier.color}dd)`,
-                    color: 'white',
-                    padding: '0.25rem 1rem',
-                    borderRadius: '20px',
-                    fontSize: '0.75rem',
-                    fontWeight: 'bold',
-                  }}
+                  className="absolute -top-3 left-1/2 -translate-x-1/2 text-white px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg"
+                  style={{ background: `linear-gradient(135deg, ${tier.color}, #006D88)` }}
                 >
                   MOST POPULAR
                 </div>
               )}
               
-              <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
-                <h4 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#1F2937' }}>{tier.name}</h4>
-                <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: '0.25rem' }}>
-                  <span style={{ fontSize: '2rem', fontWeight: 'bold', color: tier.color }}>{tier.price}</span>
-                  <span style={{ fontSize: '0.875rem', color: '#6B7280' }}>{tier.period}</span>
+              <div className="text-center mb-6">
+                <h4 className="text-xl font-black text-gray-800 font-sniglet uppercase">{tier.name}</h4>
+                <div className="flex items-baseline justify-center gap-1">
+                  <span className="text-4xl font-black" style={{ color: tier.color }}>{tier.price}</span>
+                  <span className="text-gray-400 text-sm font-bold">{tier.period}</span>
                 </div>
               </div>
 
-              <div style={{ marginBottom: '1rem' }}>
-                <p style={{ fontSize: '0.875rem', color: '#6B7280', marginBottom: '0.5rem' }}>
-                  <strong style={{ color: '#1F2937' }}>{tier.dailyLimit}</strong> generations/day
-                </p>
-                <p style={{ fontSize: '0.875rem', color: '#6B7280' }}>
-                  <strong style={{ color: '#1F2937' }}>{tier.models.join(', ')}</strong> models
-                </p>
-              </div>
-
-              <div style={{ marginBottom: '1.5rem' }}>
+              <div className="space-y-3 mb-8 flex-grow">
                 {tier.features.map((feature, i) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
-                    <Check size={16} style={{ color: tier.color }} />
-                    <span style={{ fontSize: '0.875rem', color: '#4B5563' }}>{feature}</span>
+                  <div key={i} className="flex items-start gap-3">
+                    <Check size={16} className="mt-1 flex-shrink-0" style={{ color: tier.color }} />
+                    <span className="text-sm font-bold text-gray-600 font-varela leading-tight">{feature}</span>
                   </div>
                 ))}
               </div>
 
-              {currentTier === tier.id ? (
-                <button
-                  disabled
-                  style={{
-                    width: '100%',
-                    padding: '0.75rem',
-                    background: '#E5E7EB',
-                    border: 'none',
-                    borderRadius: '12px',
-                    color: '#6B7280',
-                    fontWeight: 'bold',
-                    cursor: 'not-allowed',
-                  }}
-                >
-                  Current Plan
-                </button>
-              ) : (
-                <button
-                  onClick={() => handleUpgrade(tier.id)}
-                  style={{
-                    width: '100%',
-                    padding: '0.75rem',
-                    background: `linear-gradient(135deg, ${tier.color}, ${tier.color}dd)`,
-                    border: 'none',
-                    borderRadius: '12px',
-                    color: 'white',
-                    fontWeight: 'bold',
-                    cursor: 'pointer',
-                    transition: 'transform 0.2s',
-                  }}
-                  onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-                  onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-                >
-                  {TIERS.findIndex(t => t.id === currentTier) < TIERS.findIndex(t => t.id === tier.id) 
-                    ? 'Upgrade' 
-                    : 'Switch'}
-                </button>
-              )}
+              <button
+                onClick={() => ! (currentTier === tier.id) && handleUpgrade(tier.id)}
+                disabled={currentTier === tier.id}
+                className={`w-full py-3 rounded-xl font-black uppercase tracking-widest transition-all ${
+                  currentTier === tier.id
+                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    : 'text-white shadow-lg hover:shadow-xl active:scale-95'
+                }`}
+                style={{
+                  background: currentTier === tier.id ? '' : `linear-gradient(135deg, ${tier.color}, #006D88)`
+                }}
+              >
+                {currentTier === tier.id ? 'Active Plan' : 'Select Plan'}
+              </button>
             </div>
           ))}
         </div>
 
         {/* Footer */}
-        <p style={{ textAlign: 'center', color: 'white/70', marginTop: '2rem', fontSize: '0.875rem' }}>
+        <p className="text-center text-white/60 mt-12 font-black uppercase tracking-[0.2em] text-[10px]">
           Powered by AI Tool Pool
         </p>
       </div>

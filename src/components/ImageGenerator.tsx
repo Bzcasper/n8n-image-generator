@@ -254,25 +254,21 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({ onBackToLanding }) => {
         }}
       />
 
-      <div className="relative z-10 flex flex-col h-screen overflow-hidden">
-        <div className="absolute top-4 right-4 z-20 flex items-center gap-3">
+      <div className="relative z-10 flex flex-col h-full lg:h-screen lg:overflow-hidden">
+        <div className="absolute top-3 right-14 md:top-4 md:right-4 z-20 flex items-center gap-2 md:gap-3">
           {isAuthenticated && user && (
             <div className="flex flex-col items-end">
-              <div className="flex items-center gap-1.5 px-3 py-1 bg-white/80 backdrop-blur-md rounded-full shadow-sm border border-blue/20">
-                <Diamond className="w-3.5 h-3.5 text-blue" />
-                <span className="text-xs font-black font-sniglet text-blue">
-                  {user.pollen.toFixed(3)}
+              <div className="flex items-center gap-1 md:gap-1.5 px-2 md:px-3 py-1 bg-white/80 backdrop-blur-md rounded-full shadow-sm border border-blue/20">
+                <Diamond className="w-3 h-3 md:w-3.5 md:h-3.5 text-blue" />
+                <span className="text-[10px] md:text-xs font-black font-sniglet text-blue">
+                  {user.pollen.toFixed(2)}
                 </span>
-                <span className="text-[8px] font-black text-navy/30 uppercase tracking-widest ml-1">Pollen</span>
               </div>
-              <span className="text-[8px] font-black text-navy/40 uppercase tracking-widest mt-1 mr-2">
-                Tier: {user.tier}
-              </span>
             </div>
           )}
           <button
             onClick={() => navigate('/account/profile')}
-            className="px-5 py-2.5 border-2 border-white/20 rounded-16 font-varela font-bold text-white shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 active:scale-95"
+            className="hidden sm:block px-3 md:px-5 py-1.5 md:py-2.5 border-2 border-white/20 rounded-12 md:rounded-16 font-varela font-bold text-xs md:text-base text-white shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 active:scale-95"
             style={{
               background: 'linear-gradient(135deg, #48E5B6 0%, #00B4FF 100%)',
             }}
@@ -282,10 +278,10 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({ onBackToLanding }) => {
         </div>
         <Header onBackToLanding={onBackToLanding} />
 
-        <main className="flex-grow flex flex-col px-4 md:px-6 py-2 overflow-hidden h-full">
-          <div className="flex-grow grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6 overflow-hidden max-w-[1600px] mx-auto w-full h-full min-h-0">
+        <main className="flex-grow flex flex-col px-4 md:px-6 py-2 min-h-0">
+          <div className="flex-grow grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6 max-w-[1600px] mx-auto w-full min-h-0 lg:overflow-hidden">
             {/* Left Column: Form */}
-            <div className="lg:col-span-4 h-full min-h-0 flex flex-col overflow-hidden">
+            <div className="lg:col-span-4 h-full min-h-[500px] lg:min-h-0 flex flex-col lg:overflow-hidden">
               <GenerationForm
                 onGenerate={generateImage}
                 isLoading={isLoading}
@@ -294,7 +290,7 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({ onBackToLanding }) => {
             </div>
 
             {/* Right Column: Main Image Display */}
-            <div className="lg:col-span-8 h-full min-h-0 flex flex-col overflow-hidden">
+            <div className="lg:col-span-8 h-full min-h-[400px] lg:min-h-0 flex flex-col lg:overflow-hidden">
               <ImageDisplay
                 image={currentImage}
                 isLoading={isLoading}
@@ -305,7 +301,7 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({ onBackToLanding }) => {
           </div>
 
           {/* Bottom Section: History */}
-          <div className="mt-4 flex-shrink-0 overflow-hidden">
+          <div className="mt-4 mb-4 lg:mb-0 flex-shrink-0">
             <ImageGallery
               images={imageHistory}
               onImageSelect={handleImageSelect}
