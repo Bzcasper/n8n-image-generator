@@ -7,6 +7,7 @@ import ImageGallery from './ImageGallery';
 import { GenerationParams, GeneratedImage } from '../types';
 import { sessionImageCache } from '../lib/imageCache';
 import { useAuth, fetchWithAuth } from '../lib/backendAuth';
+import { MODELS, TIER_LIMITS } from '../lib/models';
 
 interface ImageGeneratorProps {
   onBackToLanding: () => void;
@@ -20,7 +21,7 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({ onBackToLanding }) => {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const { isAuthenticated, accessToken, isLoading: authLoading } = useAuth();
+  const { user, isAuthenticated, accessToken, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
   const abortControllerRef = React.useRef<AbortController | null>(null);
   const objectUrlsRef = React.useRef<Set<string>>(new Set());
@@ -91,28 +92,58 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({ onBackToLanding }) => {
     }, 60000);
 
     try {
-      const webhookUrl = import.meta.env.VITE_N8N_WEBHOOK_URL;
+      const selectedModel = MODELS.find(m => m.id === params.model) || MODELS[0];
+      const pollenBalance = user?.pollen || 0;
 
-      if (!webhookUrl) {
-        throw new Error('Webhook URL not configured. Please set VITE_N8N_WEBHOOK_URL in your .env file.');
+      // Enforcement logic
+      if (selectedModel.isPaidOnly && (!isAuthenticated || user?.tier === 'SEED')) {
+        setError(`Upgrade required. ${selectedModel.name} is a Diamond model.`);
+        setIsLoading(false);
+        return;
       }
 
-      // Sanitize input by trimming whitespace
-      const sanitizedMessage = params.message.trim();
+      if (pollenBalance < selectedModel.cost) {
+        setError(`Insufficient Pollen. Needed: ${selectedModel.cost}, Available: ${pollenBalance.toFixed(3)}`);
+        setIsLoading(false);
+        return;
+      }
 
+      const [width, height] = params.size.split('x').map(Number);
+
+      const styleMap: Record<string, string> = {
+        photorealistic: '',
+        artistic: 'oil painting style, masterpiece',
+        cartoon: 'cartoon style, animated',
+        cyberpunk: 'cyberpunk aesthetic, neon lights',
+        fantasy: 'fantasy art, magical',
+        minimalist: 'minimalist design, clean',
+        vintage: 'vintage style, retro',
+      };
+
+      const promptWithStyle = params.style !== 'photorealistic' && styleMap[params.style]
+        ? `${params.message}, ${styleMap[params.style]}`
+        : params.message;
+
+      const encodedPrompt = encodeURIComponent(promptWithStyle);
       const queryParams = new URLSearchParams({
-        message: sanitizedMessage,
-        style: params.style,
-        size: params.size,
-        quality: params.quality,
-        model: params.model,
+        width: width.toString(),
+        height: height.toString(),
         seed: params.seed.toString(),
+        model: selectedModel.id,
+        enhance: params.quality === 'high' ? 'true' : 'false',
       });
 
-      const response = await fetch(`${webhookUrl}/generate-image?${queryParams}`, {
+      const imageUrl = `https://gen.pollinations.ai/image/${encodedPrompt}?${queryParams}`;
+
+      const apiKey = import.meta.env.VITE_POLLINATIONS_API_KEY;
+      const referrer = import.meta.env.VITE_APP_URL || 'http://localhost:5173';
+
+      const response = await fetch(imageUrl, {
         method: 'GET',
         headers: {
-          'Content-Type': 'application/json',
+          'Accept': 'image/*',
+          'Referer': referrer,
+          ...(apiKey ? { 'Authorization': `Bearer ${apiKey}` } : {}),
         },
         signal: abortController.signal,
       });
@@ -125,30 +156,26 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({ onBackToLanding }) => {
       }
 
       const imageBlob = await response.blob();
-      const imageUrl = URL.createObjectURL(imageBlob);
+      const blobUrl = URL.createObjectURL(imageBlob);
 
       const generatedImage: GeneratedImage = {
         id: Date.now().toString(),
-        url: imageUrl,
+        url: blobUrl,
         prompt: params.message,
         style: params.style,
         size: params.size,
         quality: params.quality,
-        model: params.model,
+        model: selectedModel.name,
         seed: params.seed,
         timestamp: new Date().toISOString(),
+        cost: selectedModel.cost
       };
 
       setCurrentImage(generatedImage);
       setImageHistory((prev) => [generatedImage, ...prev]);
 
-      objectUrlsRef.current.add(imageUrl);
-
+      objectUrlsRef.current.add(blobUrl);
       sessionImageCache.addImage(generatedImage);
-
-      await fetch('/api/increment-generation', {
-        method: 'POST',
-      }).catch((err) => console.error('Failed to increment rate limit:', err));
 
       if (isAuthenticated && accessToken) {
         await fetchWithAuth('/api/users/images', {
@@ -159,6 +186,8 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({ onBackToLanding }) => {
             style: params.style,
             size: params.size,
             quality: params.quality,
+            model: selectedModel.id,
+            cost: selectedModel.cost,
             seed: params.seed,
           }),
         }).catch((err) => console.error('Failed to save image:', err));
@@ -174,7 +203,7 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({ onBackToLanding }) => {
       abortControllerRef.current = null;
       setIsLoading(false);
     }
-  }, [isAuthenticated, accessToken]);
+  }, [isAuthenticated, accessToken, user]);
 
   const handleImageSelect = useCallback((image: GeneratedImage) => {
     setCurrentImage(image);
@@ -225,22 +254,38 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({ onBackToLanding }) => {
         }}
       />
 
-      <div className="relative z-10 flex flex-col h-full">
-        <button
-          onClick={() => navigate('/account/profile')}
-          className="absolute top-4 right-4 z-20 px-4 py-2 rounded-16 font-varela font-bold text-white shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 active:scale-95"
-          style={{
-            background: 'linear-gradient(135deg, #48E5B6 0%, #00B4FF 100%)',
-          }}
-        >
-          Dashboard
-        </button>
+      <div className="relative z-10 flex flex-col h-screen overflow-hidden">
+        <div className="absolute top-4 right-4 z-20 flex items-center gap-3">
+          {isAuthenticated && user && (
+            <div className="flex flex-col items-end">
+              <div className="flex items-center gap-1.5 px-3 py-1 bg-white/80 backdrop-blur-md rounded-full shadow-sm border border-blue/20">
+                <Diamond className="w-3.5 h-3.5 text-blue" />
+                <span className="text-xs font-black font-sniglet text-blue">
+                  {user.pollen.toFixed(3)}
+                </span>
+                <span className="text-[8px] font-black text-navy/30 uppercase tracking-widest ml-1">Pollen</span>
+              </div>
+              <span className="text-[8px] font-black text-navy/40 uppercase tracking-widest mt-1 mr-2">
+                Tier: {user.tier}
+              </span>
+            </div>
+          )}
+          <button
+            onClick={() => navigate('/account/profile')}
+            className="px-4 py-2 rounded-16 font-varela font-bold text-white shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 active:scale-95"
+            style={{
+              background: 'linear-gradient(135deg, #48E5B6 0%, #00B4FF 100%)',
+            }}
+          >
+            Dashboard
+          </button>
+        </div>
         <Header onBackToLanding={onBackToLanding} />
 
-        <main className="flex-grow flex flex-col px-4 md:px-6 py-4">
-          <div className="flex-grow grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6 overflow-hidden max-w-[1600px] mx-auto w-full min-h-0">
+        <main className="flex-grow flex flex-col px-4 md:px-6 py-2 overflow-hidden h-full">
+          <div className="flex-grow grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6 overflow-hidden max-w-[1600px] mx-auto w-full h-full min-h-0">
             {/* Left Column: Form */}
-            <div className="lg:col-span-4 min-h-0 flex flex-col">
+            <div className="lg:col-span-4 h-full min-h-0 flex flex-col overflow-hidden">
               <GenerationForm
                 onGenerate={generateImage}
                 isLoading={isLoading}
@@ -249,7 +294,7 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({ onBackToLanding }) => {
             </div>
 
             {/* Right Column: Main Image Display */}
-            <div className="lg:col-span-8 min-h-0 flex flex-col">
+            <div className="lg:col-span-8 h-full min-h-0 flex flex-col overflow-hidden">
               <ImageDisplay
                 image={currentImage}
                 isLoading={isLoading}
@@ -260,7 +305,7 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({ onBackToLanding }) => {
           </div>
 
           {/* Bottom Section: History */}
-          <div className="mt-4 md:mt-6 flex-shrink-0 h-40 md:h-48">
+          <div className="mt-4 flex-shrink-0 overflow-hidden">
             <ImageGallery
               images={imageHistory}
               onImageSelect={handleImageSelect}
@@ -269,7 +314,7 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({ onBackToLanding }) => {
           </div>
         </main>
 
-        <footer className="py-2 text-center text-[10px] font-black uppercase tracking-widest text-navy/30 font-varela">
+        <footer className="py-1 text-center text-[8px] font-black uppercase tracking-widest text-navy/30 font-varela flex-shrink-0">
           Powered by AI Tool Pool
         </footer>
       </div>

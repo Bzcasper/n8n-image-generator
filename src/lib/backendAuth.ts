@@ -10,6 +10,8 @@ export interface User {
   lastName?: string;
   avatar?: string;
   role: string;
+  tier: 'SEED' | 'SPORE' | 'FLOWER' | 'NECTAR';
+  pollen: number;
   isActive: boolean;
   emailVerified: boolean;
   createdAt: string;

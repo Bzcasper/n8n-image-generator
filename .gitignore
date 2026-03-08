@@ -109,3 +109,5 @@ backend/prisma/migrations/*/migration.sql
 .serena/
 .cursor/
 .claude/
+.vercel
+.env*.local

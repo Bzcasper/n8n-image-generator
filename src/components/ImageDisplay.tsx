@@ -73,8 +73,8 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({ image, isLoading, error, on
 
   return (
     <>
-      <div className="bg-white/90 backdrop-blur-md rounded-20 shadow-xl p-4 md:p-6 border border-navy/10 h-full flex flex-col min-h-0 overflow-hidden">
-        <div className="flex items-center justify-between mb-4 flex-shrink-0">
+      <div className="bg-white/90 backdrop-blur-md rounded-20 shadow-xl p-3 md:p-4 border border-navy/10 h-full flex flex-col min-h-0 overflow-hidden">
+        <div className="flex items-center justify-between mb-2 flex-shrink-0">
           <div>
             <h3 className="text-xl font-black font-sniglet text-black uppercase tracking-tight leading-none">Your Splash</h3>
             <p className="text-[10px] text-navy/40 font-black font-varela uppercase tracking-widest mt-1">AI-Powered Masterpiece</p>
@@ -105,15 +105,26 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({ image, isLoading, error, on
           </div>
         </div>
 
-        <div className="relative flex-grow flex items-center justify-center bg-navy/[0.02] rounded-xl overflow-hidden border border-navy/5 shadow-inner p-2 min-h-0 group">
-          <img
-            src={image.url}
-            alt={image.prompt}
-            className={`max-w-full max-h-full object-contain rounded-lg shadow-2xl transition-all duration-500 ${
-              imageLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
-            }`}
-            onLoad={handleImageLoad}
-          />
+        <div className="relative flex-grow flex items-center justify-center bg-[#EBEEF2] rounded-xl overflow-hidden border border-navy/5 shadow-inner p-4 min-h-0 group">
+          <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#006D88 0.5px, transparent 0.5px)', backgroundSize: '10px 10px' }}></div>
+          
+          {/* Main Image Canvas */}
+          <div className="relative w-full h-full flex items-center justify-center">
+            <img
+              src={image.url}
+              alt={image.prompt}
+              className={`max-w-full max-h-full w-auto h-auto object-contain rounded-lg shadow-2xl transition-all duration-500 relative z-10 ${
+                imageLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
+              }`}
+              onLoad={handleImageLoad}
+              style={{
+                filter: 'drop-shadow(0 20px 50px rgba(0,0,0,0.2))'
+              }}
+            />
+            
+            {/* Aspect Ratio Guide - very subtle */}
+            <div className="absolute inset-4 border border-navy/5 rounded-lg pointer-events-none z-0"></div>
+          </div>
           {!imageLoaded && (
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="w-8 h-8 border-2 border-blue border-t-transparent rounded-full animate-spin"></div>
@@ -128,22 +139,22 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({ image, isLoading, error, on
           </div>
         </div>
 
-        <div className="mt-4 grid grid-cols-4 gap-2 flex-shrink-0">
-          <div className="flex flex-col items-center p-2 bg-navy/5 rounded-xl border border-navy/5">
-            <span className="text-[8px] font-black text-navy/30 uppercase tracking-tighter">Style</span>
-            <span className="text-[10px] font-black font-sniglet text-navy uppercase truncate w-full text-center">{image.style}</span>
+        <div className="mt-2 grid grid-cols-4 gap-2 flex-shrink-0">
+          <div className="flex flex-col items-center p-1 bg-navy/5 rounded-xl border border-navy/5">
+            <span className="text-[7px] font-black text-navy/30 uppercase tracking-tighter">Style</span>
+            <span className="text-[9px] font-black font-sniglet text-navy uppercase truncate w-full text-center">{image.style}</span>
           </div>
-          <div className="flex flex-col items-center p-2 bg-navy/5 rounded-xl border border-navy/5">
-            <span className="text-[8px] font-black text-navy/30 uppercase tracking-tighter">Size</span>
-            <span className="text-[10px] font-black font-sniglet text-navy uppercase truncate w-full text-center">{image.size}</span>
+          <div className="flex flex-col items-center p-1 bg-navy/5 rounded-xl border border-navy/5">
+            <span className="text-[7px] font-black text-navy/30 uppercase tracking-tighter">Size</span>
+            <span className="text-[9px] font-black font-sniglet text-navy uppercase truncate w-full text-center">{image.size}</span>
           </div>
-          <div className="flex flex-col items-center p-2 bg-navy/5 rounded-xl border border-navy/5">
-            <span className="text-[8px] font-black text-navy/30 uppercase tracking-tighter">Model</span>
-            <span className="text-[10px] font-black font-sniglet text-navy uppercase truncate w-full text-center">{image.model}</span>
+          <div className="flex flex-col items-center p-1 bg-navy/5 rounded-xl border border-navy/5">
+            <span className="text-[7px] font-black text-navy/30 uppercase tracking-tighter">Model</span>
+            <span className="text-[9px] font-black font-sniglet text-navy uppercase truncate w-full text-center">{image.model}</span>
           </div>
-          <div className="flex flex-col items-center p-2 bg-navy/5 rounded-xl border border-navy/5">
-            <span className="text-[8px] font-black text-navy/30 uppercase tracking-tighter">Quality</span>
-            <span className="text-[10px] font-black font-sniglet text-navy uppercase truncate w-full text-center">{image.quality}</span>
+          <div className="flex flex-col items-center p-1 bg-navy/5 rounded-xl border border-navy/5">
+            <span className="text-[7px] font-black text-navy/30 uppercase tracking-tighter">Quality</span>
+            <span className="text-[9px] font-black font-sniglet text-navy uppercase truncate w-full text-center">{image.quality}</span>
           </div>
         </div>
       </div>

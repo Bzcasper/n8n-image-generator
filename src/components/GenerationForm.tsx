@@ -1,6 +1,7 @@
-import React, { useState, useCallback } from 'react';
-import { Wand2, Shuffle, Settings, ChevronDown, Sparkles } from 'lucide-react';
+import React, { useState, useCallback, useMemo } from 'react';
+import { Wand2, Shuffle, Settings, ChevronDown, Sparkles, Diamond } from 'lucide-react';
 import { GenerationParams, StyleOption, QualityOption, ModelOption } from '../types';
+import { MODELS } from '../lib/models';
 
 const STYLE_OPTIONS: StyleOption[] = [
   { value: 'photorealistic', label: 'Photorealistic', description: 'Ultra-realistic photography' },
@@ -16,12 +17,6 @@ const QUALITY_OPTIONS: QualityOption[] = [
   { value: 'high', label: 'Ultra HD', description: 'Maximum quality & detail' },
   { value: 'medium', label: 'High Quality', description: 'Balanced performance' },
   { value: 'low', label: 'Standard', description: 'Fast generation' },
-];
-
-const MODEL_OPTIONS: ModelOption[] = [
-  { value: 'flux', label: 'Flux Pro', description: 'Latest premium model' },
-  { value: 'turbo', label: 'Turbo', description: 'Lightning fast results' },
-  { value: 'default', label: 'Classic', description: 'Reliable & consistent' },
 ];
 
 const SIZE_OPTIONS = [
@@ -48,6 +43,20 @@ const GenerationForm: React.FC<GenerationFormProps> = ({ onGenerate, isLoading, 
   const [seed, setSeed] = useState<number>(Math.floor(Math.random() * 1000000));
   const [showAdvanced, setShowAdvanced] = useState(false);
 
+  const modelOptions = useMemo(() => {
+    return MODELS.map(m => ({
+      value: m.id,
+      label: m.name,
+      description: m.description,
+      isPaidOnly: m.isPaidOnly,
+      cost: m.cost
+    }));
+  }, []);
+
+  const selectedModel = useMemo(() => {
+    return MODELS.find(m => m.id === model) || MODELS[0];
+  }, [model]);
+
   const handleSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault();
     if (message.trim() && !isLoading) {
@@ -69,8 +78,8 @@ const GenerationForm: React.FC<GenerationFormProps> = ({ onGenerate, isLoading, 
   const isFormValid = message.trim().length >= 3 && message.trim().length <= 500;
 
   return (
-    <div className="bg-white/90 backdrop-blur-md rounded-20 shadow-xl p-4 md:p-6 border border-navy/10 h-full flex flex-col min-h-0">
-      <div className="flex items-center space-x-3 mb-6">
+    <div className="bg-white/90 backdrop-blur-md rounded-20 shadow-xl p-3 md:p-4 border border-navy/10 h-full flex flex-col min-h-0 overflow-hidden">
+      <div className="flex items-center space-x-3 mb-3">
         <div className="p-2 bg-navy/5 rounded-lg">
           <Wand2 className="w-5 h-5 text-navy" />
         </div>
@@ -80,8 +89,8 @@ const GenerationForm: React.FC<GenerationFormProps> = ({ onGenerate, isLoading, 
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4 md:space-y-5 flex-grow flex flex-col min-h-0 overflow-hidden">
-        <div className="space-y-2">
+      <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4 flex-grow flex flex-col min-h-0 overflow-hidden">
+        <div className="space-y-1">
           <label htmlFor="message" className="block text-[11px] font-black font-varela text-navy uppercase tracking-widest">
             Prompt
           </label>
@@ -91,8 +100,8 @@ const GenerationForm: React.FC<GenerationFormProps> = ({ onGenerate, isLoading, 
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="A majestic dragon..."
-              className="w-full px-4 py-3 border-2 border-navy/5 rounded-xl focus:ring-2 focus:ring-blue focus:border-blue resize-none transition-all duration-300 text-sm font-bold font-varela text-slate-700 placeholder-slate-400 bg-white shadow-inner"
-              rows={3}
+              className="w-full px-4 py-2 border-2 border-navy/5 rounded-xl focus:ring-2 focus:ring-blue focus:border-blue resize-none transition-all duration-300 text-sm font-bold font-varela text-slate-700 placeholder-slate-400 bg-white shadow-inner"
+              rows={2}
               maxLength={500}
               required
             />
@@ -103,9 +112,9 @@ const GenerationForm: React.FC<GenerationFormProps> = ({ onGenerate, isLoading, 
           </div>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-2">
           <label className="block text-[11px] font-black font-varela text-navy uppercase tracking-widest">Art Style</label>
-          <div className="grid grid-cols-2 gap-3 overflow-y-auto max-h-[160px] md:max-h-[180px] pr-1 custom-scrollbar">
+          <div className="grid grid-cols-2 gap-2 overflow-y-auto max-h-[120px] md:max-h-[140px] pr-1 custom-scrollbar">
             {STYLE_OPTIONS.map((option) => (
               <label key={option.value} className={`group flex flex-col items-center justify-center p-3 border-2 rounded-16 cursor-pointer transition-all duration-300 relative overflow-hidden ${
                 style === option.value
@@ -135,9 +144,9 @@ const GenerationForm: React.FC<GenerationFormProps> = ({ onGenerate, isLoading, 
           </div>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-2">
           <label className="block text-[11px] font-black font-varela text-navy uppercase tracking-widest">Dimensions</label>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
             {SIZE_OPTIONS.map((option) => (
               <label key={option.value} className={`group flex flex-col items-center justify-center p-3 border-2 rounded-16 cursor-pointer transition-all duration-300 relative overflow-hidden ${
                 size === option.value
@@ -200,17 +209,39 @@ const GenerationForm: React.FC<GenerationFormProps> = ({ onGenerate, isLoading, 
                </div>
                <div className="space-y-1">
                  <label className="block text-[9px] font-black font-varela text-navy/40 uppercase tracking-widest">AI Model</label>
-                 <select 
-                    value={model}
-                    onChange={(e) => setModel(e.target.value)}
-                    className="w-full text-[10px] font-bold font-varela bg-white border-2 border-navy/5 rounded-lg px-2 py-1 outline-none focus:border-blue"
-                 >
-                   {MODEL_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
-                 </select>
+                 <div className="relative">
+                   <select 
+                      value={model}
+                      onChange={(e) => setModel(e.target.value)}
+                      className={`w-full text-[10px] font-bold font-varela bg-white border-2 border-navy/5 rounded-lg pl-2 pr-8 py-1.5 outline-none focus:border-blue appearance-none transition-all ${
+                        selectedModel?.isPaidOnly ? 'text-blue' : 'text-slate-700'
+                      }`}
+                   >
+                     {modelOptions.map(opt => (
+                       <option key={opt.value} value={opt.value}>
+                         {opt.label} ({opt.cost} Pollen) {opt.isPaidOnly ? '💎' : ''}
+                       </option>
+                     ))}
+                   </select>
+                   <div className="absolute inset-y-0 right-2 flex items-center pointer-events-none">
+                     {selectedModel?.isPaidOnly ? (
+                       <Diamond className="w-3 h-3 text-blue" />
+                     ) : (
+                       <ChevronDown className="w-3 h-3 text-navy/30" />
+                     )}
+                   </div>
+                 </div>
                </div>
             </div>
             <div className="space-y-1">
-               <label htmlFor="seed" className="block text-[9px] font-black font-varela text-navy/40 uppercase tracking-widest">Seed Value</label>
+               <label htmlFor="seed" className="block text-[9px] font-black font-varela text-navy/40 uppercase tracking-widest">
+                 Seed Value 
+                 {selectedModel && (
+                   <span className="ml-2 text-[8px] font-black text-blue/60 lowercase italic">
+                     Cost: {selectedModel.cost} Pollen
+                   </span>
+                 )}
+               </label>
                <div className="flex space-x-2">
                  <input
                     type="number"

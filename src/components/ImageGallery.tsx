@@ -40,8 +40,8 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, onImageSelect, onDo
 
   return (
     <>
-      <div className="bg-white/80 backdrop-blur-sm rounded-20 shadow-xl p-4 border border-white/20">
-        <div className="flex items-center justify-between mb-4">
+      <div className="bg-white/80 backdrop-blur-sm rounded-20 shadow-xl p-3 border border-white/20">
+        <div className="flex items-center justify-between mb-2">
           <div>
             <h3 className="text-lg font-black font-sniglet text-black uppercase tracking-tight">Your Gallery</h3>
             <p className="text-[10px] text-navy/50 font-varela font-bold uppercase tracking-wider">
@@ -74,11 +74,11 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, onImageSelect, onDo
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2">
+          <div className="flex gap-2 overflow-x-auto pb-2 custom-scrollbar">
             {filteredImages.map((image) => (
               <div
                 key={image.id}
-                className={`relative group aspect-square rounded-12 overflow-hidden cursor-pointer transition-all duration-200 ${
+                className={`relative group aspect-square h-20 md:h-24 flex-shrink-0 rounded-12 overflow-hidden cursor-pointer transition-all duration-200 ${
                   selectedImage?.id === image.id ? 'ring-2 ring-blue shadow-lg scale-105' : 'hover:ring-2 hover:ring-mint hover:scale-105'
                 }`}
                 onClick={() => handleImageClick(image)}

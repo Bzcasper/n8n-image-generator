@@ -17,6 +17,7 @@ export interface GeneratedImage {
   model: string;
   seed: number;
   timestamp: string;
+  cost?: number;
 }
 
 export interface StyleOption {
@@ -35,4 +36,17 @@ export interface ModelOption {
   value: string;
   label: string;
   description: string;
+  isPaidOnly?: boolean;
+  cost?: number;
+}
+
+export interface User {
+  id: string;
+  email: string;
+  username?: string;
+  firstName?: string;
+  lastName?: string;
+  avatarUrl?: string;
+  tier: 'SEED' | 'SPORE' | 'FLOWER' | 'NECTAR';
+  pollen: number;
 }

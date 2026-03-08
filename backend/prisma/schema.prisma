@@ -15,6 +15,13 @@ enum Role {
   ADMIN
 }
 
+enum Tier {
+  SEED
+  SPORE
+  FLOWER
+  NECTAR
+}
+
 model User {
   id             String    @id @default(cuid())
   email          String    @unique
@@ -24,6 +31,8 @@ model User {
   lastName       String?
   avatar         String?
   role           Role      @default(USER)
+  tier           Tier      @default(SEED)
+  pollen         Float     @default(3.0) // Initial daily grant
   isActive       Boolean   @default(true)
   emailVerified  Boolean   @default(false)
   createdAt      DateTime  @default(now())
@@ -57,6 +66,8 @@ model GeneratedImage {
   style       String?
   size        String?
   quality     String?
+  model       String?
+  cost        Float    @default(0.0)
   seed        Int?
   createdAt   DateTime @default(now())
 
