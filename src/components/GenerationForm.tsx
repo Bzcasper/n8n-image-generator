@@ -85,7 +85,6 @@ const GenerationForm: React.FC<GenerationFormProps> = ({ onGenerate, isLoading, 
       
       const generatedPrompt = await response.text();
       
-      // If we get the deprecation notice or empty response, use a fallback
       if (!generatedPrompt || generatedPrompt.includes('IMPORTANT NOTICE') || generatedPrompt.length < 10) {
         const fallbacks = [
           'A neon cyberpunk city in the rain with flying cars',
@@ -111,7 +110,7 @@ const GenerationForm: React.FC<GenerationFormProps> = ({ onGenerate, isLoading, 
 
   return (
     <div className="bg-white/90 backdrop-blur-md rounded-20 shadow-xl p-3 md:p-4 border border-navy/10 h-full flex flex-col min-h-0 overflow-hidden">
-      <div className="flex items-center space-x-3 mb-3">
+      <div className="flex items-center space-x-3 mb-3 flex-shrink-0">
         <div className="p-2 bg-navy/5 rounded-lg">
           <Wand2 className="w-5 h-5 text-navy" />
         </div>
@@ -121,233 +120,219 @@ const GenerationForm: React.FC<GenerationFormProps> = ({ onGenerate, isLoading, 
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4 flex-grow flex flex-col min-h-0 overflow-hidden">
-        <div className="space-y-1">
-          <label htmlFor="message" className="block text-[11px] font-black font-varela text-navy uppercase tracking-widest">
-            Prompt
-          </label>
-          <div className="relative">
-            <textarea
-              id="message"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              placeholder="A majestic dragon..."
-              className="w-full px-4 py-2 border-2 border-navy/5 rounded-xl focus:ring-2 focus:ring-blue focus:border-blue resize-none transition-all duration-300 text-sm font-bold font-varela text-slate-700 placeholder-slate-400 bg-white shadow-inner"
-              rows={2}
-              maxLength={500}
-              required
-            />
-            <div className="absolute bottom-2 right-3 flex items-center space-x-2">
-              <button
-                type="button"
-                onClick={generateRandomPrompt}
-                disabled={isGeneratingPrompt}
-                className="flex items-center space-x-1 px-2 py-1 bg-gradient-to-r from-[#48E5B6]/10 to-[#00B4FF]/10 hover:from-[#48E5B6]/20 hover:to-[#00B4FF]/20 rounded-lg transition-all disabled:opacity-50"
-                title="Generate random prompt"
-              >
-                {isGeneratingPrompt ? (
-                  <Loader2 className="w-3 h-3 text-blue animate-spin" />
-                ) : (
-                  <WandSparkles className="w-3 h-3 text-blue" />
-                )}
-                <span className="text-[9px] font-black text-navy/60">Random</span>
-              </button>
-              <Sparkles className="w-3 h-3 text-blue/40" />
-              <span className="text-[10px] text-navy/30 font-black">{message.length}/500</span>
+      <form onSubmit={handleSubmit} className="flex-grow flex flex-col min-h-0 overflow-hidden">
+        {/* Scrollable Form Body */}
+        <div className="flex-grow overflow-y-auto pr-1 space-y-4 custom-scrollbar">
+          <div className="space-y-1">
+            <label htmlFor="message" className="block text-[11px] font-black font-varela text-navy uppercase tracking-widest">
+              Prompt
+            </label>
+            <div className="relative">
+              <textarea
+                id="message"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                placeholder="A majestic dragon..."
+                className="w-full px-4 py-2 border-2 border-navy/5 rounded-xl focus:ring-2 focus:ring-blue focus:border-blue resize-none transition-all duration-300 text-sm font-bold font-varela text-slate-700 placeholder-slate-400 bg-white shadow-inner"
+                rows={2}
+                maxLength={500}
+                required
+              />
+              <div className="absolute bottom-2 right-3 flex items-center space-x-2">
+                <button
+                  type="button"
+                  onClick={generateRandomPrompt}
+                  disabled={isGeneratingPrompt}
+                  className="flex items-center space-x-1.5 px-3 py-2 bg-gradient-to-r from-[#48E5B6]/10 to-[#00B4FF]/10 hover:from-[#48E5B6]/20 hover:to-[#00B4FF]/20 rounded-lg transition-all disabled:opacity-50"
+                  title="Generate random prompt"
+                >
+                  {isGeneratingPrompt ? (
+                    <Loader2 className="w-4 h-4 text-blue animate-spin" />
+                  ) : (
+                    <WandSparkles className="w-4 h-4 text-blue" />
+                  )}
+                  <span className="text-[10px] font-black text-navy/60">Random</span>
+                </button>
+                <Sparkles className="w-3 h-3 text-blue/40" />
+                <span className="text-[10px] text-navy/30 font-black">{message.length}/500</span>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="space-y-2">
-          <label className="block text-[11px] font-black font-varela text-navy uppercase tracking-widest">Art Style</label>
-          <div className="grid grid-cols-2 gap-2 overflow-y-auto max-h-[120px] md:max-h-[140px] pr-1 custom-scrollbar">
-            {STYLE_OPTIONS.map((option) => (
-              <label key={option.value} className={`group flex flex-col items-center justify-center p-3 border-2 rounded-16 cursor-pointer transition-all duration-300 relative overflow-hidden ${
-                style === option.value
-                  ? 'border-blue bg-blue/5 shadow-md scale-105'
-                  : 'border-navy/5 bg-white'
-              }`}>
-                <input
-                  type="radio"
-                  name="style"
-                  value={option.value}
-                  checked={style === option.value}
-                  onChange={(e) => setStyle(e.target.value)}
-                  className="sr-only"
-                />
-                <span className={`text-sm font-black font-sniglet text-center relative z-20 transition-opacity duration-300 ${style === option.value ? 'text-blue' : 'text-slate-600 group-hover:opacity-0'}`}>
-                  {option.label}
-                </span>
-                <span className={`absolute inset-0 z-20 flex items-center justify-center text-sm font-black font-sniglet text-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none`}>
-                  <span className="bg-gradient-to-r from-[#00B4FF] via-[#48E5B6] to-[#006D88] bg-clip-text text-transparent">
+          <div className="space-y-2">
+            <label className="block text-[11px] font-black font-varela text-navy uppercase tracking-widest">Art Style</label>
+            <div className="grid grid-cols-2 gap-3">
+              {STYLE_OPTIONS.map((option) => (
+                <label key={option.value} className={`group flex flex-col items-center justify-center p-4 border-2 rounded-16 cursor-pointer transition-all duration-300 relative overflow-hidden ${
+                  style === option.value
+                    ? 'border-blue bg-blue/5 shadow-md scale-105'
+                    : 'border-navy/5 bg-white'
+                }`}>
+                  <input
+                    type="radio"
+                    name="style"
+                    value={option.value}
+                    checked={style === option.value}
+                    onChange={(e) => setStyle(e.target.value)}
+                    className="sr-only"
+                  />
+                  <span className={`text-sm font-black font-sniglet text-center relative z-20 transition-opacity duration-300 ${style === option.value ? 'text-blue' : 'text-slate-600 group-hover:opacity-0'}`}>
                     {option.label}
                   </span>
-                </span>
-                <div className={`absolute inset-0 z-10 bg-white opacity-0 transition-opacity duration-800 rounded-16 ${style === option.value ? '' : 'group-hover:opacity-100'}`}></div>
-                <div className={`absolute inset-0 z-10 border-2 border-transparent rounded-16 transition-all duration-500 ${style === option.value ? '' : 'group-hover:border-[#00B4FF] group-hover:animate-border-draw group-hover:shadow-[0_0_20px_rgba(0,180,255,0.4),0_0_40px_rgba(72,229,182,0.3),0_0_60px_rgba(0,109,136,0.2)]'}`}></div>
-              </label>
-            ))}
+                  <span className={`absolute inset-0 z-20 flex items-center justify-center text-sm font-black font-sniglet text-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none`}>
+                    <span className="bg-gradient-to-r from-[#00B4FF] via-[#48E5B6] to-[#006D88] bg-clip-text text-transparent">
+                      {option.label}
+                    </span>
+                  </span>
+                  <div className={`absolute inset-0 z-10 bg-white opacity-0 transition-opacity duration-800 rounded-16 ${style === option.value ? '' : 'group-hover:opacity-100'}`}></div>
+                  <div className={`absolute inset-0 z-10 border-2 border-transparent rounded-16 transition-all duration-500 ${style === option.value ? '' : 'group-hover:border-[#00B4FF] group-hover:animate-border-draw'}`}></div>
+                </label>
+              ))}
+            </div>
           </div>
-        </div>
 
-        <div className="space-y-2">
-          <label className="block text-[11px] font-black font-varela text-navy uppercase tracking-widest">Dimensions</label>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-            {SIZE_OPTIONS.map((option) => (
-              <label key={option.value} className={`group flex flex-col items-center justify-center p-3 border-2 rounded-16 cursor-pointer transition-all duration-300 relative overflow-hidden ${
-                size === option.value
-                  ? 'border-mint bg-mint/5 shadow-md scale-105'
-                  : 'border-navy/5 bg-white'
-              }`}>
-                <input
-                  type="radio"
-                  name="size"
-                  value={option.value}
-                  checked={size === option.value}
-                  onChange={(e) => setSize(e.target.value)}
-                  className="sr-only"
-                />
-                <span className={`text-sm font-black font-sniglet text-center relative z-20 transition-opacity duration-300 ${size === option.value ? 'text-mint' : 'text-slate-600 group-hover:opacity-0'}`}>
-                  {option.label}
-                </span>
-                <span className={`text-xs font-bold font-varela text-center relative z-20 transition-opacity duration-300 ${size === option.value ? 'text-navy/40' : 'text-slate-400 group-hover:opacity-0'}`}>
-                  {option.description}
-                </span>
-                <span className="absolute inset-0 z-20 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-                  <span className="text-sm font-black font-sniglet text-center bg-gradient-to-r from-[#00B4FF] via-[#48E5B6] to-[#006D88] bg-clip-text text-transparent">
+          <div className="space-y-2">
+            <label className="block text-[11px] font-black font-varela text-navy uppercase tracking-widest">Dimensions</label>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {SIZE_OPTIONS.map((option) => (
+                <label key={option.value} className={`group flex flex-col items-center justify-center p-4 border-2 rounded-16 cursor-pointer transition-all duration-300 relative overflow-hidden ${
+                  size === option.value
+                    ? 'border-mint bg-mint/5 shadow-md scale-105'
+                    : 'border-navy/5 bg-white'
+                }`}>
+                  <input
+                    type="radio"
+                    name="size"
+                    value={option.value}
+                    checked={size === option.value}
+                    onChange={(e) => setSize(e.target.value)}
+                    className="sr-only"
+                  />
+                  <span className={`text-xs font-black font-sniglet text-center relative z-20 transition-opacity duration-300 ${size === option.value ? 'text-mint' : 'text-slate-600 group-hover:opacity-0'}`}>
                     {option.label}
                   </span>
-                  <span className="text-xs font-bold font-varela text-center text-navy/40">
-                    {option.description}
-                  </span>
-                </span>
-                <div className={`absolute inset-0 z-10 bg-white opacity-0 transition-opacity duration-800 rounded-16 ${size === option.value ? '' : 'group-hover:opacity-100'}`}></div>
-                <div className={`absolute inset-0 z-10 border-2 border-transparent rounded-16 transition-all duration-500 ${size === option.value ? '' : 'group-hover:border-[#48E5B6] group-hover:animate-border-draw group-hover:shadow-[0_0_20px_rgba(72,229,182,0.4),0_0_40px_rgba(0,180,255,0.3),0_0_60px_rgba(0,109,136,0.2)]'}`}></div>
-              </label>
-            ))}
+                  <div className={`absolute inset-0 z-10 bg-white opacity-0 transition-opacity duration-800 rounded-16 ${size === option.value ? '' : 'group-hover:opacity-100'}`}></div>
+                  <div className={`absolute inset-0 z-10 border-2 border-transparent rounded-16 transition-all duration-500 ${size === option.value ? '' : 'group-hover:border-[#48E5B6] group-hover:animate-border-draw'}`}></div>
+                </label>
+              ))}
+            </div>
           </div>
-        </div>
 
-        <div className="pt-1">
-          <button
-            type="button"
-            onClick={() => setShowAdvanced(!showAdvanced)}
-            className="flex items-center space-x-2 text-[10px] font-black font-varela text-navy/40 hover:text-navy transition-colors uppercase tracking-widest group"
-          >
-            <Settings className="w-3 h-3 group-hover:rotate-90 transition-transform duration-300" />
-            <span>Advanced Settings</span>
-            <ChevronDown className={`w-3 h-3 transition-transform duration-300 ${showAdvanced ? 'rotate-180' : ''}`} />
-          </button>
-        </div>
+          <div className="pt-1">
+            <button
+              type="button"
+              onClick={() => setShowAdvanced(!showAdvanced)}
+              className="flex items-center space-x-2 text-[10px] font-black font-varela text-navy/40 hover:text-navy transition-colors uppercase tracking-widest group"
+            >
+              <Settings className="w-3 h-3 group-hover:rotate-90 transition-transform duration-300" />
+              <span>Advanced Settings</span>
+              <ChevronDown className={`w-3 h-3 transition-transform duration-300 ${showAdvanced ? 'rotate-180' : ''}`} />
+            </button>
+          </div>
 
-        {showAdvanced && (
-          <div className="space-y-4 pt-4 border-t border-navy/5 animate-in slide-in-from-top duration-300 flex-shrink-0 overflow-y-auto max-h-[200px] md:max-h-[250px] pr-1 custom-scrollbar">
-            <div className="grid grid-cols-2 gap-4">
-               <div className="space-y-1">
-                 <label className="block text-[9px] font-black font-varela text-navy/40 uppercase tracking-widest">Quality Level</label>
-                 <select 
-                    value={quality}
-                    onChange={(e) => setQuality(e.target.value)}
-                    className="w-full text-[10px] font-bold font-varela bg-white border-2 border-navy/5 rounded-lg px-2 py-1 outline-none focus:border-blue"
-                 >
-                   {QUALITY_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
-                 </select>
-               </div>
-               <div className="space-y-1">
-                 <label className="block text-[9px] font-black font-varela text-navy/40 uppercase tracking-widest">AI Model</label>
-                 <div className="relative">
+          {showAdvanced && (
+            <div className="space-y-4 pt-4 border-t border-navy/5 animate-in slide-in-from-top duration-300">
+              <div className="grid grid-cols-2 gap-4">
+                 <div className="space-y-1">
+                   <label className="block text-[9px] font-black font-varela text-navy/40 uppercase tracking-widest">Quality Level</label>
                    <select 
-                      value={model}
-                      onChange={(e) => setModel(e.target.value)}
-                      className={`w-full text-[10px] font-bold font-varela bg-white border-2 border-navy/5 rounded-lg pl-2 pr-8 py-1.5 outline-none focus:border-blue appearance-none transition-all ${
-                        selectedModel?.isPaidOnly ? 'text-blue' : 'text-slate-700'
-                      }`}
+                      value={quality}
+                      onChange={(e) => setQuality(e.target.value)}
+                      className="w-full text-[10px] font-bold font-varela bg-white border-2 border-navy/5 rounded-lg px-2 py-2 outline-none focus:border-blue"
                    >
-                     {modelOptions.map(opt => (
-                       <option key={opt.value} value={opt.value}>
-                         {opt.label} ({opt.cost} Pollen) {opt.isPaidOnly ? '💎' : ''}
-                       </option>
-                     ))}
+                     {QUALITY_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
                    </select>
-                   <div className="absolute inset-y-0 right-2 flex items-center pointer-events-none">
-                     {selectedModel?.isPaidOnly ? (
-                       <Diamond className="w-3 h-3 text-blue" />
-                     ) : (
-                       <ChevronDown className="w-3 h-3 text-navy/30" />
-                     )}
+                 </div>
+                 <div className="space-y-1">
+                   <label className="block text-[9px] font-black font-varela text-navy/40 uppercase tracking-widest">AI Model</label>
+                   <div className="relative">
+                     <select 
+                        value={model}
+                        onChange={(e) => setModel(e.target.value)}
+                        className={`w-full text-[10px] font-bold font-varela bg-white border-2 border-navy/5 rounded-lg pl-2 pr-8 py-2 outline-none focus:border-blue appearance-none transition-all ${
+                          selectedModel?.isPaidOnly ? 'text-blue' : 'text-slate-700'
+                        }`}
+                     >
+                       {modelOptions.map(opt => (
+                         <option key={opt.value} value={opt.value}>
+                           {opt.label} ({opt.cost} Pollen) {opt.isPaidOnly ? '💎' : ''}
+                         </option>
+                       ))}
+                     </select>
+                     <div className="absolute inset-y-0 right-2 flex items-center pointer-events-none">
+                       {selectedModel?.isPaidOnly ? (
+                         <Diamond className="w-3 h-3 text-blue" />
+                       ) : (
+                         <ChevronDown className="w-3 h-3 text-navy/30" />
+                       )}
+                     </div>
                    </div>
                  </div>
-               </div>
+              </div>
+              <div className="space-y-1">
+                 <label htmlFor="seed" className="block text-[9px] font-black font-varela text-navy/40 uppercase tracking-widest">
+                   Seed Value 
+                   {selectedModel && (
+                     <span className="ml-2 text-[8px] font-black text-blue/60 lowercase italic">
+                       Cost: {selectedModel.cost} Pollen
+                     </span>
+                   )}
+                 </label>
+                 <div className="flex space-x-2">
+                   <input
+                      type="number"
+                      id="seed"
+                      value={seed}
+                      onChange={(e) => setSeed(parseInt(e.target.value) || 0)}
+                      className="flex-1 px-3 py-2 border-2 border-navy/5 rounded-lg text-xs font-bold font-varela outline-none focus:border-blue"
+                   />
+                   <button
+                      type="button"
+                      onClick={generateRandomSeed}
+                      className="p-2.5 bg-navy/5 text-navy border-2 border-transparent rounded-lg hover:bg-navy/10 hover:border-navy/10 transition-all"
+                    >
+                      <Shuffle className="w-4 h-4" />
+                    </button>
+                 </div>
+              </div>
             </div>
-            <div className="space-y-1">
-               <label htmlFor="seed" className="block text-[9px] font-black font-varela text-navy/40 uppercase tracking-widest">
-                 Seed Value 
-                 {selectedModel && (
-                   <span className="ml-2 text-[8px] font-black text-blue/60 lowercase italic">
-                     Cost: {selectedModel.cost} Pollen
-                   </span>
-                 )}
-               </label>
-               <div className="flex space-x-2">
-                 <input
-                    type="number"
-                    id="seed"
-                    value={seed}
-                    onChange={(e) => setSeed(parseInt(e.target.value) || 0)}
-                    className="flex-1 px-3 py-1.5 border-2 border-navy/5 rounded-lg text-xs font-bold font-varela outline-none focus:border-blue"
-                 />
-                 <button
-                    type="button"
-                    onClick={generateRandomSeed}
-                    className="p-2 bg-navy/5 text-navy border-2 border-transparent rounded-lg hover:bg-navy/10 hover:border-navy/10 transition-all"
-                  >
-                    <Shuffle className="w-4 h-4" />
-                  </button>
-               </div>
-            </div>
-          </div>
-        )}
+          )}
+        </div>
 
-        <div className="pt-2 mt-auto">
+        {/* Fixed Footer with Button */}
+        <div className="pt-4 mt-auto border-t border-navy/5 bg-white/50 backdrop-blur-sm -mx-4 px-4 pb-2 flex-shrink-0">
           {error && (
-            <div className="p-3 mb-4 bg-red-50 border-2 border-red-100 rounded-xl">
+            <div className="p-2 mb-2 bg-red-50 border-2 border-red-100 rounded-xl">
               <p className="text-[10px] text-red-600 font-bold font-varela leading-tight">{error}</p>
             </div>
           )}
 
-          <div className="relative group py-4">
+          <div className="relative group">
             <div 
-              className="absolute -inset-2 blur-2xl opacity-40 group-hover:opacity-70 transition-all duration-700 animate-float"
+              className="absolute -inset-1 blur-xl opacity-20 group-hover:opacity-40 transition-opacity duration-500 animate-pulse-glow"
               style={{
                 background: 'radial-gradient(circle, #48E5B6 0%, #00B4FF 50%, #006D88 100%)',
-              }}
-            />
-            <div 
-              className="absolute -inset-1 blur-xl opacity-60 animate-pulse-glow"
-              style={{
-                background: 'linear-gradient(135deg, #48E5B6 0%, #00B4FF 50%, #006D88 100%)',
               }}
             />
             
             <button
               type="submit"
               disabled={!isFormValid || isLoading}
-              className="relative w-full text-white py-6 px-8 rounded-2xl font-black font-sniglet text-xl uppercase tracking-widest disabled:opacity-40 disabled:cursor-not-allowed hover:scale-105 active:scale-95 transition-all duration-300 shadow-2xl"
+              className="relative w-full text-white py-3.5 px-6 border-2 border-white/20 rounded-xl font-black font-sniglet text-base uppercase tracking-widest disabled:opacity-40 disabled:cursor-not-allowed hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 shadow-xl"
               style={{
                 background: 'linear-gradient(135deg, #48E5B6 0%, #00B4FF 50%, #006D88 100%)',
-                boxShadow: '0 10px 40px rgba(0, 180, 255, 0.4), 0 0 60px rgba(72, 229, 182, 0.3)',
               }}
             >
               {isLoading ? (
-                <div className="flex items-center justify-center space-x-3">
-                  <div className="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
-                  <span className="text-lg">Generating Magic...</span>
+                <div className="flex items-center justify-center space-x-2">
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <span className="text-sm">Generating...</span>
                 </div>
               ) : (
-                <div className="flex items-center justify-center space-x-3">
-                  <WandSparkles className="w-7 h-7 animate-bounce" />
-                  <span className="text-lg">Splash It!</span>
-                  <Sparkles className="w-7 h-7 animate-bounce" style={{ animationDelay: '0.2s' }} />
+                <div className="flex items-center justify-center space-x-2">
+                  <WandSparkles className="w-5 h-5" />
+                  <span className="text-base">Splash It!</span>
+                  <Sparkles className="w-5 h-5" />
                 </div>
               )}
             </button>
