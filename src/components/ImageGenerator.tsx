@@ -7,7 +7,7 @@ import ImageGallery from './ImageGallery';
 import { GenerationParams, GeneratedImage } from '../types';
 import { sessionImageCache } from '../lib/imageCache';
 import { useAuth, fetchWithAuth } from '../lib/backendAuth';
-import { MODELS, TIER_LIMITS } from '../lib/models';
+import { MODELS } from '../lib/models';
 
 interface ImageGeneratorProps {
   onBackToLanding: () => void;
@@ -272,7 +272,7 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({ onBackToLanding }) => {
           )}
           <button
             onClick={() => navigate('/account/profile')}
-            className="px-4 py-2 rounded-16 font-varela font-bold text-white shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 active:scale-95"
+            className="px-5 py-2.5 border-2 border-white/20 rounded-16 font-varela font-bold text-white shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 active:scale-95"
             style={{
               background: 'linear-gradient(135deg, #48E5B6 0%, #00B4FF 100%)',
             }}

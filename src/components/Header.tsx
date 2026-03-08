@@ -24,9 +24,9 @@ const Header: React.FC<HeaderProps> = ({ onBackToLanding }) => {
           {onBackToLanding && (
             <button
               onClick={onBackToLanding}
-              className="absolute left-0 flex items-center gap-2 text-navy hover:text-blue transition-colors font-varela"
+              className="absolute left-0 flex items-center gap-2 px-3 py-1.5 border-2 border-navy/5 rounded-xl text-navy hover:text-blue hover:border-blue/20 transition-all font-varela group"
             >
-              <ArrowLeft className="w-4 h-4" />
+              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
               <span className="text-sm font-bold uppercase tracking-wider">Back</span>
             </button>
           )}
@@ -55,7 +55,7 @@ const Header: React.FC<HeaderProps> = ({ onBackToLanding }) => {
                 </div>
                 <button
                   onClick={handleLogout}
-                  className="flex items-center gap-2 text-xs font-bold text-navy hover:text-blue transition-colors uppercase tracking-wider"
+                  className="flex items-center gap-2 px-3 py-1.5 border-2 border-navy/5 rounded-xl text-xs font-bold text-navy hover:text-blue hover:border-blue/20 transition-all uppercase tracking-wider"
                 >
                   <LogOut className="w-4 h-4" />
                   Logout

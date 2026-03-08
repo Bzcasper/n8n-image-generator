@@ -79,26 +79,26 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({ image, isLoading, error, on
             <h3 className="text-xl font-black font-sniglet text-black uppercase tracking-tight leading-none">Your Splash</h3>
             <p className="text-[10px] text-navy/40 font-black font-varela uppercase tracking-widest mt-1">AI-Powered Masterpiece</p>
           </div>
-          <div className="flex space-x-1.5">
+          <div className="flex space-x-2">
             <button
               onClick={() => setIsLiked(!isLiked)}
-              className={`p-2.5 rounded-xl transition-all duration-300 ${
+              className={`p-2.5 border-2 rounded-xl transition-all duration-300 ${
                 isLiked 
-                  ? 'bg-red-500 text-white shadow-lg' 
-                  : 'bg-navy/5 text-navy/40 hover:bg-red-50 hover:text-red-500'
+                  ? 'bg-red-500 text-white border-red-500 shadow-lg' 
+                  : 'bg-white text-navy/40 border-navy/5 hover:border-red-500/20 hover:text-red-500'
               }`}
             >
               <Heart className={`w-4 h-4 ${isLiked ? 'fill-current' : ''}`} />
             </button>
             <button
               onClick={handleFullscreen}
-              className="p-2.5 bg-navy/5 text-navy/40 rounded-xl hover:bg-blue/10 hover:text-blue transition-all duration-300"
+              className="p-2.5 bg-white text-navy/40 border-2 border-navy/5 rounded-xl hover:border-blue/20 hover:text-blue transition-all duration-300"
             >
               <Maximize className="w-4 h-4" />
             </button>
             <button
               onClick={() => onDownload(image)}
-              className="p-2.5 bg-gradient-to-r from-blue to-navy text-white rounded-xl hover:shadow-lg transition-all duration-300"
+              className="p-2.5 bg-gradient-to-r from-blue to-navy text-white border-2 border-white/10 rounded-xl hover:shadow-lg transition-all duration-300"
             >
               <Download className="w-4 h-4" />
             </button>

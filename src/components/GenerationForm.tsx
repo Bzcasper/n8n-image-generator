@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import { Wand2, Shuffle, Settings, ChevronDown, Sparkles, Diamond } from 'lucide-react';
-import { GenerationParams, StyleOption, QualityOption, ModelOption } from '../types';
+import { Wand2, Shuffle, Settings, ChevronDown, Sparkles, Diamond, Loader2, WandSparkles } from 'lucide-react';
+import { GenerationParams, StyleOption, QualityOption } from '../types';
 import { MODELS } from '../lib/models';
 
 const STYLE_OPTIONS: StyleOption[] = [
@@ -42,6 +42,7 @@ const GenerationForm: React.FC<GenerationFormProps> = ({ onGenerate, isLoading, 
   const [model, setModel] = useState<string>('flux');
   const [seed, setSeed] = useState<number>(Math.floor(Math.random() * 1000000));
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [isGeneratingPrompt, setIsGeneratingPrompt] = useState(false);
 
   const modelOptions = useMemo(() => {
     return MODELS.map(m => ({
@@ -75,6 +76,41 @@ const GenerationForm: React.FC<GenerationFormProps> = ({ onGenerate, isLoading, 
     setSeed(Math.floor(Math.random() * 1000000));
   }, []);
 
+  const generateRandomPrompt = useCallback(async () => {
+    setIsGeneratingPrompt(true);
+    try {
+      const response = await fetch('https://text.pollinations.ai/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'openai',
+          messages: [
+            {
+              role: 'user',
+              content: 'Generate a creative, detailed image prompt (1-2 sentences maximum). Be specific and imaginative. Include subjects, setting, lighting, mood, and any artistic style if relevant. Just output the prompt, nothing else.'
+            }
+          ],
+          seed: Math.floor(Math.random() * 1000000),
+          stream: false
+        }),
+      });
+      
+      const data = await response.json();
+      const generatedPrompt = data.choices?.[0]?.message?.content || data.content;
+      
+      if (generatedPrompt && typeof generatedPrompt === 'string') {
+        const cleanPrompt = generatedPrompt.trim().slice(0, 500);
+        setMessage(cleanPrompt);
+      }
+    } catch (err) {
+      console.error('Failed to generate random prompt:', err);
+    } finally {
+      setIsGeneratingPrompt(false);
+    }
+  }, []);
+
   const isFormValid = message.trim().length >= 3 && message.trim().length <= 500;
 
   return (
@@ -105,7 +141,21 @@ const GenerationForm: React.FC<GenerationFormProps> = ({ onGenerate, isLoading, 
               maxLength={500}
               required
             />
-            <div className="absolute bottom-2 right-3 flex items-center space-x-1">
+            <div className="absolute bottom-2 right-3 flex items-center space-x-2">
+              <button
+                type="button"
+                onClick={generateRandomPrompt}
+                disabled={isGeneratingPrompt}
+                className="flex items-center space-x-1 px-2 py-1 bg-gradient-to-r from-[#48E5B6]/10 to-[#00B4FF]/10 hover:from-[#48E5B6]/20 hover:to-[#00B4FF]/20 rounded-lg transition-all disabled:opacity-50"
+                title="Generate random prompt"
+              >
+                {isGeneratingPrompt ? (
+                  <Loader2 className="w-3 h-3 text-blue animate-spin" />
+                ) : (
+                  <WandSparkles className="w-3 h-3 text-blue" />
+                )}
+                <span className="text-[9px] font-black text-navy/60">Random</span>
+              </button>
               <Sparkles className="w-3 h-3 text-blue/40" />
               <span className="text-[10px] text-navy/30 font-black">{message.length}/500</span>
             </div>
@@ -253,7 +303,7 @@ const GenerationForm: React.FC<GenerationFormProps> = ({ onGenerate, isLoading, 
                  <button
                     type="button"
                     onClick={generateRandomSeed}
-                    className="p-1.5 bg-navy/5 text-navy rounded-lg hover:bg-navy/10 transition-colors"
+                    className="p-2 bg-navy/5 text-navy border-2 border-transparent rounded-lg hover:bg-navy/10 hover:border-navy/10 transition-all"
                   >
                     <Shuffle className="w-4 h-4" />
                   </button>
@@ -280,7 +330,7 @@ const GenerationForm: React.FC<GenerationFormProps> = ({ onGenerate, isLoading, 
             <button
               type="submit"
               disabled={!isFormValid || isLoading}
-              className="relative w-full text-white py-3 px-6 rounded-xl font-black font-sniglet text-sm uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed hover:-translate-y-1 transition-all duration-300 shadow-lg"
+              className="relative w-full text-white py-3.5 px-6 border-2 border-white/20 rounded-xl font-black font-sniglet text-base uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed hover:-translate-y-1 active:translate-y-0 transition-all duration-300 shadow-lg"
               style={{
                 background: 'linear-gradient(135deg, #48E5B6 0%, #00B4FF 50%, #006D88 100%)',
               }}

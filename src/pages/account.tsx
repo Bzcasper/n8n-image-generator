@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../lib/backendAuth';
-import { Crown, Zap, Check, X, Star } from 'lucide-react';
+import { Crown, Zap, Check, Star } from 'lucide-react';
 
 const TIERS = [
   {
@@ -51,7 +51,7 @@ const TIERS = [
   },
 ];
 
-const Account: React.FC = () => {
+export function Account() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [currentTier, setCurrentTier] = useState('free');

@@ -10,7 +10,6 @@ const POLLINATIONS_AUTH_URL = 'https://enter.pollinations.ai/authorize';
 const PollinationsAuth: React.FC<PollinationsAuthProps> = ({ onTierChange }) => {
   const [apiKey, setApiKey] = useState<string>(localStorage.getItem('pollinations_api_key') || '');
   const [showInput, setShowInput] = useState(false);
-  const [isConnecting, setIsConnecting] = useState(false);
 
   const handleConnect = useCallback(() => {
     const redirectUrl = window.location.origin + window.location.pathname;
@@ -35,7 +34,6 @@ const PollinationsAuth: React.FC<PollinationsAuthProps> = ({ onTierChange }) => 
   }, [onTierChange]);
 
   const isConnected = !!localStorage.getItem('pollinations_api_key');
-  const tier = localStorage.getItem('user_tier') || 'free';
 
   return (
     <div className="bg-white/90 backdrop-blur-md rounded-20 shadow-xl p-4 border border-navy/10">
@@ -127,12 +125,3 @@ const PollinationsAuth: React.FC<PollinationsAuthProps> = ({ onTierChange }) => 
 };
 
 export default PollinationsAuth;
-
-export const getUserTier = (): string => {
-  return localStorage.getItem('user_tier') || 'free';
-};
-
-export const isPremiumUser = (): boolean => {
-  const tier = getUserTier();
-  return tier !== 'free';
-};
