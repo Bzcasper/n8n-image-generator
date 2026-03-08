@@ -171,13 +171,13 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, onImageSelect, onDo
                   </div>
                 </div>
 
-                <div className="flex gap-2 mt-6">
+                <div className="flex gap-3 mt-6">
                   <button
                     onClick={() => toggleLike(selectedImage.id)}
-                    className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-black font-sniglet text-sm uppercase tracking-wider transition-all duration-200 ${
+                    className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 border-2 rounded-xl font-black font-sniglet text-sm uppercase tracking-wider transition-all duration-200 ${
                       likedImages.has(selectedImage.id)
-                        ? 'bg-pink-500 text-white hover:bg-pink-600'
-                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                        ? 'bg-pink-500 text-white border-pink-500 shadow-lg'
+                        : 'bg-white text-navy/40 border-navy/5 hover:border-pink-500/20 hover:text-pink-500'
                     }`}
                   >
                     <Heart className={`w-4 h-4 ${likedImages.has(selectedImage.id) ? 'fill-current' : ''}`} />
@@ -189,7 +189,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, onImageSelect, onDo
                       onDownload(selectedImage);
                       setSelectedImage(null);
                     }}
-                    className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-black font-sniglet text-sm uppercase tracking-wider text-white transition-all duration-200 hover:-translate-y-1 shadow-lg"
+                    className="flex-1 flex items-center justify-center gap-2 py-3 px-4 border-2 border-white/10 rounded-xl font-black font-sniglet text-sm uppercase tracking-wider text-white transition-all duration-200 hover:shadow-xl active:scale-95 shadow-lg"
                     style={{
                       background: 'linear-gradient(135deg, #48E5B6 0%, #00B4FF 50%, #006D88 100%)',
                     }}

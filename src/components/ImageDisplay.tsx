@@ -140,19 +140,19 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({ image, isLoading, error, on
         </div>
 
         <div className="mt-2 grid grid-cols-4 gap-2 flex-shrink-0">
-          <div className="flex flex-col items-center p-1 bg-navy/5 rounded-xl border border-navy/5">
+          <div className="flex flex-col items-center p-1 bg-white border-2 border-navy/5 rounded-xl">
             <span className="text-[7px] font-black text-navy/30 uppercase tracking-tighter">Style</span>
             <span className="text-[9px] font-black font-sniglet text-navy uppercase truncate w-full text-center">{image.style}</span>
           </div>
-          <div className="flex flex-col items-center p-1 bg-navy/5 rounded-xl border border-navy/5">
+          <div className="flex flex-col items-center p-1 bg-white border-2 border-navy/5 rounded-xl">
             <span className="text-[7px] font-black text-navy/30 uppercase tracking-tighter">Size</span>
             <span className="text-[9px] font-black font-sniglet text-navy uppercase truncate w-full text-center">{image.size}</span>
           </div>
-          <div className="flex flex-col items-center p-1 bg-navy/5 rounded-xl border border-navy/5">
+          <div className="flex flex-col items-center p-1 bg-white border-2 border-navy/5 rounded-xl">
             <span className="text-[7px] font-black text-navy/30 uppercase tracking-tighter">Model</span>
             <span className="text-[9px] font-black font-sniglet text-navy uppercase truncate w-full text-center">{image.model}</span>
           </div>
-          <div className="flex flex-col items-center p-1 bg-navy/5 rounded-xl border border-navy/5">
+          <div className="flex flex-col items-center p-1 bg-white border-2 border-navy/5 rounded-xl">
             <span className="text-[7px] font-black text-navy/30 uppercase tracking-tighter">Quality</span>
             <span className="text-[9px] font-black font-sniglet text-navy uppercase truncate w-full text-center">{image.quality}</span>
           </div>

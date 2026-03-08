@@ -88,27 +88,30 @@ const Header: React.FC<HeaderProps> = ({ onBackToLanding }) => {
 
       {/* Mobile Menu Overlay */}
       {isMenuOpen && (
-        <div className="md:hidden absolute top-full left-0 w-full bg-white/95 backdrop-blur-xl border-b border-navy/10 shadow-xl py-6 px-6 animate-in fade-in slide-in-from-top duration-300 z-40">
+        <div className="md:hidden absolute top-full left-0 w-full bg-white/98 backdrop-blur-xl border-b-2 border-navy/10 shadow-[0_20px_40px_rgba(0,0,0,0.1)] py-6 px-6 animate-in fade-in slide-in-from-top duration-300 z-40">
           <div className="flex flex-col space-y-4">
             {isAuthenticated && user ? (
               <>
-                <div className="flex items-center gap-3 p-3 bg-navy/5 rounded-xl">
-                  <User className="w-5 h-5 text-navy" />
+                <div className="flex items-center gap-3 p-4 bg-navy/5 rounded-2xl border border-navy/5">
+                  <div className="p-2 bg-white rounded-lg shadow-sm">
+                    <User className="w-5 h-5 text-navy" />
+                  </div>
                   <div>
-                    <p className="text-xs font-black text-navy/40 uppercase tracking-widest">Signed in as</p>
+                    <p className="text-[10px] font-black text-navy/40 uppercase tracking-widest">Signed in as</p>
                     <p className="text-sm font-bold text-navy">{user.username || user.email}</p>
                   </div>
                 </div>
                 <Link 
                   to="/account/profile" 
-                  className="text-lg font-black font-sniglet text-navy uppercase tracking-wide py-2"
+                  className="flex items-center gap-3 text-lg font-black font-sniglet text-navy uppercase tracking-wide py-3 px-4 rounded-xl hover:bg-navy/5 transition-all"
                   onClick={() => setIsMenuOpen(false)}
                 >
+                  <Sparkles className="w-5 h-5 text-mint" />
                   Dashboard
                 </Link>
                 <button
                   onClick={handleLogout}
-                  className="flex items-center gap-2 text-lg font-black font-sniglet text-red-500 uppercase tracking-wide py-2"
+                  className="flex items-center gap-3 text-lg font-black font-sniglet text-red-500 uppercase tracking-wide py-3 px-4 rounded-xl hover:bg-red-50 transition-all text-left"
                 >
                   <LogOut className="w-5 h-5" />
                   Logout
@@ -118,14 +121,14 @@ const Header: React.FC<HeaderProps> = ({ onBackToLanding }) => {
               <>
                 <Link 
                   to="/" 
-                  className="text-lg font-black font-sniglet text-navy uppercase tracking-wide py-2"
+                  className="text-lg font-black font-sniglet text-navy uppercase tracking-wide py-3 px-4 rounded-xl hover:bg-navy/5 transition-all"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Home
                 </Link>
                 <Link 
                   to="/auth/login" 
-                  className="text-lg font-black font-sniglet text-blue uppercase tracking-wide py-2"
+                  className="text-lg font-black font-sniglet text-blue uppercase tracking-wide py-3 px-4 rounded-xl hover:bg-blue/5 transition-all"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Login

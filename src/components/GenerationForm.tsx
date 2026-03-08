@@ -231,7 +231,7 @@ const GenerationForm: React.FC<GenerationFormProps> = ({ onGenerate, isLoading, 
           </div>
 
           {showAdvanced && (
-            <div className="space-y-4 pt-4 border-t border-navy/5 animate-in slide-in-from-top duration-300">
+            <div className="space-y-4 pt-4 mt-2 border-t-2 border-navy/5 animate-in slide-in-from-top duration-300 bg-navy/[0.02] -mx-4 px-4 pb-4">
               <div className="grid grid-cols-2 gap-4">
                  <div className="space-y-1">
                    <label className="block text-[9px] font-black font-varela text-navy/40 uppercase tracking-widest">Quality Level</label>
@@ -330,7 +330,7 @@ const GenerationForm: React.FC<GenerationFormProps> = ({ onGenerate, isLoading, 
           <button
             onClick={() => handleSubmit()}
             disabled={!isFormValid || isLoading}
-            className="relative w-full text-white py-4 md:py-5 px-8 border-2 border-white/30 rounded-full font-black font-sniglet text-lg md:text-xl uppercase tracking-widest disabled:opacity-40 disabled:cursor-not-allowed hover:scale-105 active:scale-95 transition-all duration-300 shadow-[0_20px_50px_rgba(0,109,136,0.5)] flex items-center justify-center space-x-3 overflow-hidden"
+            className="relative w-full text-white py-4 md:py-5 px-8 border-[3px] border-white/40 rounded-full font-black font-sniglet text-lg md:text-xl uppercase tracking-widest disabled:opacity-40 disabled:cursor-not-allowed hover:scale-105 active:scale-95 transition-all duration-300 shadow-[0_20px_50px_rgba(0,109,136,0.5)] flex items-center justify-center space-x-3 overflow-hidden ring-4 ring-black/5"
             style={{
               background: 'linear-gradient(135deg, #48E5B6 0%, #00B4FF 50%, #006D88 100%)',
             }}

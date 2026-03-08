@@ -149,9 +149,11 @@ export function Account() {
             <div
               key={tier.id}
               className={`bg-white/95 backdrop-blur-md rounded-20 p-6 relative transition-all duration-300 flex flex-col ${
-                currentTier === tier.id ? 'ring-4 ring-offset-2 scale-100' : 'hover:-translate-y-1'
+                currentTier === tier.id ? 'scale-100 shadow-2xl' : 'hover:-translate-y-1 shadow-xl'
               }`}
-              style={{ ringColor: tier.color }}
+              style={{ 
+                border: currentTier === tier.id ? `3px solid ${tier.color}` : '1px solid rgba(0,0,0,0.05)'
+              }}
             >
               {tier.popular && (
                 <div
