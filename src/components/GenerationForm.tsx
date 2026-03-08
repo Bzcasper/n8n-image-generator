@@ -79,31 +79,27 @@ const GenerationForm: React.FC<GenerationFormProps> = ({ onGenerate, isLoading, 
   const generateRandomPrompt = useCallback(async () => {
     setIsGeneratingPrompt(true);
     try {
-      const response = await fetch('https://text.pollinations.ai/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'openai',
-          messages: [
-            {
-              role: 'user',
-              content: 'Generate a creative, detailed image prompt (1-2 sentences maximum). Be specific and imaginative. Include subjects, setting, lighting, mood, and any artistic style if relevant. Just output the prompt, nothing else.'
-            }
-          ],
-          seed: Math.floor(Math.random() * 1000000),
-          stream: false
-        }),
-      });
+      const response = await fetch(`https://text.pollinations.ai/Give%20me%20a%20random%20short%20creative%20AI%20image%20prompt?model=openai&seed=${Math.floor(Math.random() * 1000000)}&nologo=true`);
       
-      const data = await response.json();
-      const generatedPrompt = data.choices?.[0]?.message?.content || data.content;
+      if (!response.ok) throw new Error('Failed to fetch prompt');
       
-      if (generatedPrompt && typeof generatedPrompt === 'string') {
-        const cleanPrompt = generatedPrompt.trim().slice(0, 500);
-        setMessage(cleanPrompt);
+      const generatedPrompt = await response.text();
+      
+      // If we get the deprecation notice or empty response, use a fallback
+      if (!generatedPrompt || generatedPrompt.includes('IMPORTANT NOTICE') || generatedPrompt.length < 10) {
+        const fallbacks = [
+          'A neon cyberpunk city in the rain with flying cars',
+          'A majestic white owl with glowing blue eyes in a dark forest',
+          'A floating island with a waterfall pouring into the clouds',
+          'An astronaut sitting on a park bench on Mars, Earth in the background',
+          'A magical library with books flying around and golden light'
+        ];
+        setMessage(fallbacks[Math.floor(Math.random() * fallbacks.length)]);
+        return;
       }
+
+      const cleanPrompt = generatedPrompt.trim().replace(/^["']|["']$/g, '').slice(0, 500);
+      setMessage(cleanPrompt);
     } catch (err) {
       console.error('Failed to generate random prompt:', err);
     } finally {
@@ -319,31 +315,39 @@ const GenerationForm: React.FC<GenerationFormProps> = ({ onGenerate, isLoading, 
             </div>
           )}
 
-          <div className="relative group">
+          <div className="relative group py-4">
             <div 
-              className="absolute inset-0 blur-xl opacity-30 group-hover:opacity-60 transition-opacity duration-500 animate-pulse-glow"
+              className="absolute -inset-2 blur-2xl opacity-40 group-hover:opacity-70 transition-all duration-700 animate-float"
               style={{
                 background: 'radial-gradient(circle, #48E5B6 0%, #00B4FF 50%, #006D88 100%)',
+              }}
+            />
+            <div 
+              className="absolute -inset-1 blur-xl opacity-60 animate-pulse-glow"
+              style={{
+                background: 'linear-gradient(135deg, #48E5B6 0%, #00B4FF 50%, #006D88 100%)',
               }}
             />
             
             <button
               type="submit"
               disabled={!isFormValid || isLoading}
-              className="relative w-full text-white py-3.5 px-6 border-2 border-white/20 rounded-xl font-black font-sniglet text-base uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed hover:-translate-y-1 active:translate-y-0 transition-all duration-300 shadow-lg"
+              className="relative w-full text-white py-6 px-8 rounded-2xl font-black font-sniglet text-xl uppercase tracking-widest disabled:opacity-40 disabled:cursor-not-allowed hover:scale-105 active:scale-95 transition-all duration-300 shadow-2xl"
               style={{
                 background: 'linear-gradient(135deg, #48E5B6 0%, #00B4FF 50%, #006D88 100%)',
+                boxShadow: '0 10px 40px rgba(0, 180, 255, 0.4), 0 0 60px rgba(72, 229, 182, 0.3)',
               }}
             >
               {isLoading ? (
-                <div className="flex items-center justify-center space-x-2">
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  <span>Generating...</span>
+                <div className="flex items-center justify-center space-x-3">
+                  <div className="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <span className="text-lg">Generating Magic...</span>
                 </div>
               ) : (
-                <div className="flex items-center justify-center space-x-2">
-                  <Sparkles className="w-4 h-4" />
-                  <span>Splash It!</span>
+                <div className="flex items-center justify-center space-x-3">
+                  <WandSparkles className="w-7 h-7 animate-bounce" />
+                  <span className="text-lg">Splash It!</span>
+                  <Sparkles className="w-7 h-7 animate-bounce" style={{ animationDelay: '0.2s' }} />
                 </div>
               )}
             </button>
